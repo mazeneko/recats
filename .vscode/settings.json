@@ -4,5 +4,11 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "always",
     "source.addMissingImports.ts": "always"
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
   }
 }
