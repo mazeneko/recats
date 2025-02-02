@@ -8,7 +8,8 @@
     "joda",
     "libpeerconnection",
     "recats",
-    "testem"
+    "testem",
+    "trivago"
   ],
   "ignoreWords": [],
   "import": []
