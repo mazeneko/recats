@@ -2,5 +2,12 @@
 
 html,
 body {
-  @apply h-full;
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: "Noto Sans JP", "Helvetica Neue", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
