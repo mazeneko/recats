@@ -1,16 +1,15 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+
+import { SkillsComponent } from './skill/component/skills/skills.component';
+import { CURRENT_DATE_TIME } from './util/current-date-time-provider.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [SkillsComponent],
   template: `
-    <h1>Welcome to {{ title }}!</h1>
-
-    <router-outlet />
+    <div class="grid min-h-dvh items-center">
+      <app-skills></app-skills>
+    </div>
   `,
-  styles: [],
 })
-export class AppComponent {
-  title = 'recats';
-}
+export class AppComponent {}
