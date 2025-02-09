@@ -74,7 +74,6 @@ export class SkillsComponent implements OnInit {
   );
 
   castNow(skillId: string): void {
-    console.log(skillId);
     this.castCommand
       .addEvent(new CastEvent(skillId, LocalDateTime.now()))
       .then(() => this.loadSkills());
