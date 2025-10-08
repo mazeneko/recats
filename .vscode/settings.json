@@ -27,5 +27,8 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "always",
     "source.addMissingImports.ts": "always"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
   }
 }
