@@ -3,7 +3,14 @@
   "ignorePaths": [],
   "dictionaryDefinitions": [],
   "dictionaries": [],
-  "words": ["bazel", "libpeerconnection", "recats", "testem", "trivago"],
+  "words": [
+    "bazel",
+    "joda",
+    "libpeerconnection",
+    "recats",
+    "testem",
+    "trivago"
+  ],
   "ignoreWords": [],
   "import": []
 }
