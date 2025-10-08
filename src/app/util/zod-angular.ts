@@ -1,8 +1,8 @@
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
-  AbstractControlOptions,
   FormControl,
+  FormControlOptions,
   ValidatorFn,
   Validators,
 } from '@angular/forms';
@@ -75,33 +75,28 @@ export function zodTypeValidator<T extends z.ZodType>(
 export function zodTypeFormControl<T extends z.ZodType>(
   zodType: T,
   value: z.input<T> | null,
-  opts: AbstractControlOptions & { optional: true },
+  opts: FormControlOptions & { optional: true },
 ): FormControl<z.input<T> | null>;
 export function zodTypeFormControl<T extends z.ZodType>(
   zodType: T,
   value: z.input<T> | null,
-  opts?: AbstractControlOptions & { optional?: false },
+  opts?: FormControlOptions & { optional?: false },
 ): FormControl<z.input<T>>;
 export function zodTypeFormControl<T extends z.ZodType>(
   zodType: T,
   value: z.input<T> | null,
-  opts: AbstractControlOptions & ZodTypeValidationOptions = {},
+  opts: FormControlOptions & ZodTypeValidationOptions = {},
 ): FormControl<z.input<T> | null> {
+  const { validators, optional, ...restOpts } = opts;
   // validatorsがnullだったり関数だったり配列だったりするので配列の形に一般化します。
   const normalizedValidators =
-    opts.validators == null
-      ? []
-      : Array.isArray(opts.validators)
-        ? opts.validators
-        : [opts.validators];
+    validators == null ? [] : Array.isArray(validators) ? validators : [validators];
   // 渡されたオプションを拡張してコントロールを作ります。
-  const optional = opts.optional ?? false;
-  const preValidators = optional ? [] : [Validators.required];
+  const preValidators = (optional ?? false) ? [] : [Validators.required];
   const postValidators = [zodTypeValidator(zodType, { optional })];
   const formControl = new FormControl(value, {
     validators: [...preValidators, ...normalizedValidators, ...postValidators],
-    asyncValidators: opts.asyncValidators,
-    updateOn: opts.updateOn,
+    ...restOpts,
   });
   // optionalな場合は自動で空文字をnullに置き換えるようにします。
   if (optional) {
