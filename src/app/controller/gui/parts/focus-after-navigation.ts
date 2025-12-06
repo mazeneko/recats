@@ -3,6 +3,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 
+import { DevelopmentError } from '../../../error/development-error';
+
 /**
  * routerのナビゲーション後にフォーカスを当てます。
  */
@@ -23,7 +25,9 @@ export class FocusAfterNavigation {
         return;
       }
       if (!(this.elementRef.nativeElement instanceof HTMLElement)) {
-        throw new Error('elementRefがHTMLElementではありません');
+        throw new DevelopmentError('elementRefがHTMLElementではありません', {
+          errorCode: 'FocusAfterNavigationTargetMistake',
+        });
       }
       this.elementRef.nativeElement.focus();
     });
