@@ -1,10 +1,4 @@
 import { z, ZodType } from 'zod';
-import {
-  $InferInnerFunctionType,
-  $InferInnerFunctionTypeAsync,
-  $ZodFunctionIn,
-  $ZodFunctionOut,
-} from 'zod/v4/core';
 
 /**
  * zodのparseの引数の型を適切にするためのユーティリティです。
@@ -62,24 +56,4 @@ export function zodUnknownSafeParse<T extends ZodType, DUMMY>(
   data: OnlyUnknown<DUMMY>,
 ): z.ZodSafeParseResult<z.output<T>> {
   return schema.safeParse(data);
-}
-
-/**
- * zodの関数スキーマを作ります。
- * https://github.com/colinhacks/zod/issues/4143#issuecomment-2845134912
- */
-export function zodFunction<T extends z.core.$ZodFunction>(schema: T) {
-  return z.custom<Parameters<T['implement']>[0]>((fn) =>
-    schema.implement(fn as $InferInnerFunctionType<$ZodFunctionIn, $ZodFunctionOut>),
-  );
-}
-
-/**
- * zodの非同期関数スキーマを作ります。
- * https://github.com/colinhacks/zod/issues/4143#issuecomment-2845134912
- */
-export function zodAsyncFunction<T extends z.core.$ZodFunction>(schema: T) {
-  return z.custom<Parameters<T['implementAsync']>[0]>((fn) =>
-    schema.implementAsync(fn as $InferInnerFunctionTypeAsync<$ZodFunctionIn, $ZodFunctionOut>),
-  );
 }
