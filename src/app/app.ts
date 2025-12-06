@@ -37,7 +37,7 @@ import { zodParse } from './util/zod';
     </div>
 
     <app-create-skill-form
-      [createSkillFormInitial]="test"
+      [createSkillFormDefault]="test"
       (createSkill)="createSkill($event)"
     ></app-create-skill-form>
 
