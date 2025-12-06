@@ -3,7 +3,6 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { RouterOutlet } from '@angular/router';
 
 import {
-  CreateSkillForm,
   CreateSkillFormUi,
   CreateSkillSubmission,
 } from './controller/gui/skill/create-skill-form.ui';
@@ -20,6 +19,8 @@ import { zodParse } from './util/zod';
   selector: 'app-root',
   imports: [RouterOutlet, CreateSkillFormUi],
   template: `
+    <app-create-skill-form (createSkill)="createSkill($event)"></app-create-skill-form>
+
     <h1>Skills</h1>
     <div class="flex flex-col gap-4">
       @for (skill of skills(); track skill.id) {
@@ -36,11 +37,6 @@ import { zodParse } from './util/zod';
       }
     </div>
 
-    <app-create-skill-form
-      [createSkillFormDefault]="test"
-      (createSkill)="createSkill($event)"
-    ></app-create-skill-form>
-
     <router-outlet />
   `,
   styles: [],
@@ -52,14 +48,6 @@ export class App {
   readonly skills = this.skillReader.skills();
   readonly skillLogic = skillLogic;
 
-  // TODO フォームの初期値設定する機能のおためししてるやつ
-  readonly test: CreateSkillForm = {
-    name: 'hello',
-    recastSeconds: 13,
-    initiallyAvailable: true,
-    castingChargeLimit: 2,
-  };
-
   constructor() {
     toObservable(this.currentDateTime).subscribe((now) =>
       this.skillMutator.handleRefreshCastingChargeEvent(
@@ -70,7 +58,7 @@ export class App {
 
   createSkill(submission: CreateSkillSubmission) {
     this.skillMutator.handleCreateSkillEvent(submission.createSkillEvent);
-    submission.reset();
+    submission.resetForm();
   }
 
   useSkill(skill: Skill): void {

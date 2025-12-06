@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
-import { Field, form, submit } from '@angular/forms/signals';
+import { Field, form, schema, submit } from '@angular/forms/signals';
 import { Duration } from '@js-joda/core';
 import z from 'zod';
 
@@ -15,7 +15,7 @@ import { zodFormField, zodValidate } from '../../../util/zod-angular';
 import { FieldErrorsUi } from '../parts/field-errors.ui';
 
 /** スキル作成イベントを作るためのスキル作成フォーム */
-const CreateSkillFormSchema = z
+const CreateSkillFormToEvent = z
   .strictObject({
     /** スキル名 */
     name: zodFormField.string,
@@ -37,9 +37,16 @@ const CreateSkillFormSchema = z
     return createSkillEvent.success ? createSkillEvent.data : null;
   });
 /** スキル作成フォーム */
-export type CreateSkillForm = z.input<typeof CreateSkillFormSchema>;
+export type CreateSkillForm = z.input<typeof CreateSkillFormToEvent>;
+/** スキル作成フォームのスキーマ */
+const CREATE_SKILL_FORM_SCHEMA = schema<CreateSkillForm>((schemaPath) => {
+  zodValidate(SkillName, schemaPath.name);
+  zodValidate(z.int().min(1), schemaPath.recastSeconds);
+  zodValidate(InitiallyAvailable, schemaPath.initiallyAvailable, { required: false });
+  zodValidate(CastingChargeLimit, schemaPath.castingChargeLimit);
+});
 /** スキル作成フォームのデフォルト値 */
-export const CREATE_SKILL_FORM_DEFAULT: CreateSkillForm = {
+const CREATE_SKILL_FORM_DEFAULT: CreateSkillForm = {
   name: '',
   recastSeconds: NaN,
   initiallyAvailable: false,
@@ -55,7 +62,7 @@ export interface CreateSkillSubmission {
    * フォームをリセットします。
    * @param value リセットに使う値。省略した場合は初期値となります。
    */
-  readonly reset: (value?: CreateSkillForm) => void;
+  readonly resetForm: (value?: CreateSkillForm) => void;
 }
 
 /**
@@ -106,23 +113,16 @@ export interface CreateSkillSubmission {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateSkillFormUi {
-  /** スキル作成が実行された */
-  readonly createSkill = output<CreateSkillSubmission>();
   /** スキル作成フォームのデフォルト値 */
   readonly createSkillFormDefault = input<CreateSkillForm>(CREATE_SKILL_FORM_DEFAULT);
-  /** スキル作成フォームのモデル */
-  readonly createSkillFormModel = signal(CREATE_SKILL_FORM_DEFAULT);
-  /** スキル作成フォーム */ // TODO これもクラス外に書いてまとめたほうが見やすいか？
-  readonly createSkillForm = form(this.createSkillFormModel, (schemaPath) => {
-    zodValidate(SkillName, schemaPath.name);
-    zodValidate(z.int().min(1), schemaPath.recastSeconds);
-    zodValidate(InitiallyAvailable, schemaPath.initiallyAvailable, { required: false });
-    zodValidate(CastingChargeLimit, schemaPath.castingChargeLimit);
-  });
+  /** スキル作成フォーム */
+  readonly createSkillForm = form(signal(CREATE_SKILL_FORM_DEFAULT), CREATE_SKILL_FORM_SCHEMA);
+  /** スキル作成が実行された */
+  readonly createSkill = output<CreateSkillSubmission>();
 
   constructor() {
-    // デフォルト値が変わったらフォームにデフォルト値を設定します。
-    effect(() => this.createSkillFormModel.set(this.createSkillFormDefault()));
+    // デフォルト値が変わったらフォームをデフォルト値でリセットします。
+    effect(() => this.createSkillForm().reset(this.createSkillFormDefault()));
   }
 
   /**
@@ -141,7 +141,7 @@ export class CreateSkillFormUi {
     submit(this.createSkillForm, async (form) => {
       const formValue = form().value();
       // フォームからイベントを作成します。
-      const createSkillEvent = zodParse(CreateSkillFormSchema, formValue);
+      const createSkillEvent = zodParse(CreateSkillFormToEvent, formValue);
       if (createSkillEvent === null) {
         throw new DevelopmentError('スキル作成イベントに変換できませんでした。', {
           errorCode: 'FormDefinitionMistake',
@@ -152,7 +152,7 @@ export class CreateSkillFormUi {
       this.createSkill.emit({
         createSkillEvent,
         createSkillForm: formValue,
-        reset: (value) => this.reset(value),
+        resetForm: (value) => this.reset(value),
       });
     });
   }
