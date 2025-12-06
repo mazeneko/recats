@@ -6,9 +6,9 @@ import {
   CreateSkillFormUi,
   CreateSkillSubmission,
 } from './controller/gui/skill/create-skill-form.ui';
-import { skillLogic } from './feature/skill/domain';
+import { SkillListUi } from './controller/gui/skill/skill-list.ui';
 import { RefreshCastingChargeEvent, UseSkillEvent } from './feature/skill/domain/event/skill-event';
-import { Skill } from './feature/skill/domain/skill';
+import { SkillId } from './feature/skill/domain/skill';
 import { SKILL_MUTATOR, SKILL_READER } from './feature/skill/domain/skill-store';
 import { CURRENT_DATE_TIME } from './util/current-date-time-provider';
 import { zodParse } from './util/zod';
@@ -17,25 +17,14 @@ import { zodParse } from './util/zod';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CreateSkillFormUi],
+  imports: [RouterOutlet, CreateSkillFormUi, SkillListUi],
   template: `
     <app-create-skill-form (createSkill)="createSkill($event)"></app-create-skill-form>
-
-    <h1>Skills</h1>
-    <div class="flex flex-col gap-4">
-      @for (skill of skills(); track skill.id) {
-        <div class="ml-4">
-          <h3>name: {{ skill.name }}</h3>
-          <p>lastUsedAt: {{ skill.lastUsedAt ?? 'not used' }}</p>
-          <p>recastAt: {{ skillLogic.recastAt(skill) ?? 'none' }}</p>
-          <p>untilReady: {{ skillLogic.untilRecast(skill, currentDateTime()) ?? 'infinity' }}</p>
-          <p>charge: {{ skill.castingCharge }}</p>
-          <button type="button" (click)="useSkill(skill)" [disabled]="!skillLogic.hasCharge(skill)">
-            Use
-          </button>
-        </div>
-      }
-    </div>
+    <app-skill-list
+      [currentDateTime]="currentDateTime()"
+      [skills]="skills()"
+      (useSkill)="useSkill($event)"
+    ></app-skill-list>
 
     <router-outlet />
   `,
@@ -46,9 +35,9 @@ export class App {
   readonly skillReader = inject(SKILL_READER);
   readonly skillMutator = inject(SKILL_MUTATOR);
   readonly skills = this.skillReader.skills();
-  readonly skillLogic = skillLogic;
 
   constructor() {
+    // TODO サービスにうつす
     toObservable(this.currentDateTime).subscribe((now) =>
       this.skillMutator.handleRefreshCastingChargeEvent(
         zodParse(RefreshCastingChargeEvent, { now }),
@@ -61,12 +50,8 @@ export class App {
     submission.resetForm();
   }
 
-  useSkill(skill: Skill): void {
-    if (!skillLogic.hasCharge(skill)) {
-      console.warn('チャージがありません。');
-      return;
-    }
-    const useSkillEvent = zodParse(UseSkillEvent, { skillId: skill.id });
+  useSkill(skillId: SkillId): void {
+    const useSkillEvent = zodParse(UseSkillEvent, { skillId });
     this.skillMutator.handleUseSkillEvent(useSkillEvent);
   }
 }
