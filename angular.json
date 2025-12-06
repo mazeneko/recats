@@ -7,6 +7,8 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
+          "type": "ui",
+          "flat": true,
           "inlineTemplate": true,
           "inlineStyle": true,
           "changeDetection": "OnPush"
