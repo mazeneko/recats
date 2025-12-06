@@ -7,8 +7,9 @@ import {
   Validators,
 } from '@angular/forms';
 import z from 'zod';
+
 import { CustomValidationErrorMessages, CustomValidationErrors } from './custom-validation';
-import { zodParse } from './zod';
+import { zodParse, zodUnknownSafeParse } from './zod';
 
 /**
  * {@link zodTypeValidator}のオプション
@@ -37,8 +38,8 @@ export function zodTypeValidator<T extends z.ZodType>(
   zodType: T,
   opts: ZodTypeValidationOptions = {},
 ): ValidatorFn {
-  return (control: AbstractControl): CustomValidationErrors | null => {
-    const value = zodType.safeParse(control.value);
+  return (control: AbstractControl<unknown>): CustomValidationErrors | null => {
+    const value = zodUnknownSafeParse(zodType, control.value);
     if (value.success) {
       return null;
     }

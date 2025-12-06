@@ -18,6 +18,20 @@ export function zodParse<T extends ZodType>(schema: T, data: z.input<T>): z.outp
 }
 
 /**
+ * zodのsafeParseの引数の型を適切にするためのユーティリティです。
+ * safeParseは引数の型がunknownになっておりなんでも受け入れてしまうので型を付けています。
+ * @param schema safeParseに使うZodType
+ * @param data safeParseに渡すデータ
+ * @returns safeParseの戻り値
+ */
+export function zodSafeParse<T extends ZodType>(
+  schema: T,
+  data: z.input<T>,
+): z.ZodSafeParseResult<z.output<T>> {
+  return schema.safeParse(data);
+}
+
+/**
  * Unknownだけを許容するための型です。
  */
 export type OnlyUnknown<DUMMY> = unknown extends DUMMY ? DUMMY : never;
@@ -34,6 +48,20 @@ export function zodUnknownParse<T extends ZodType, DUMMY>(
   data: OnlyUnknown<DUMMY>,
 ): z.output<T> {
   return schema.parse(data);
+}
+
+/**
+ * {@link zodSafeParse}と対になるように用意している、型がわからない値のためのsafeParseです。
+ * unknown以外は渡せないようにしてあります。
+ * @param schema safeParseに使うZodType
+ * @param data safeParseに渡すデータ
+ * @returns safeParseの戻り値
+ */
+export function zodUnknownSafeParse<T extends ZodType, DUMMY>(
+  schema: T,
+  data: OnlyUnknown<DUMMY>,
+): z.ZodSafeParseResult<z.output<T>> {
+  return schema.safeParse(data);
 }
 
 /**
