@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { LocalDateTime } from '@js-joda/core';
 
-import { Skill, SkillId } from '../../../feature/skill/domain/skill';
+import { UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
+import { Skill } from '../../../feature/skill/domain/skill';
 import { SkillListItemUi } from './skill-list-item.ui';
 
 /**
@@ -30,13 +31,13 @@ export class SkillListUi {
   /** スキルのリスト */
   readonly skills = input.required<Skill[]>();
   /** スキルが使用された */
-  readonly useSkill = output<SkillId>();
+  readonly useSkill = output<UseSkillEvent>();
 
   /**
    * スキルを使用します。
-   * @param skillId スキルID
+   * @param useSkillEvent スキル使用イベント
    */
-  emitUseSkill(skillId: SkillId): void {
-    this.useSkill.emit(skillId);
+  emitUseSkill(useSkillEvent: UseSkillEvent): void {
+    this.useSkill.emit(useSkillEvent);
   }
 }

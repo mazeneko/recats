@@ -5,7 +5,6 @@ import {
   RefreshCastingChargeEvent,
   UseSkillEvent,
 } from '../../../feature/skill/domain/event/skill-event';
-import { SkillId } from '../../../feature/skill/domain/skill';
 import { SKILL_MUTATOR, SKILL_READER } from '../../../feature/skill/domain/skill-store';
 import { CURRENT_DATE_TIME } from '../../../util/current-date-time-provider';
 import { zodParse } from '../../../util/zod';
@@ -59,10 +58,9 @@ export class SkillPageUi {
 
   /**
    * スキルを使用します。
-   * @param skillId スキルID
+   * @param useSkillEvent スキル使用イベント
    */
-  useSkill(skillId: SkillId): void {
-    const useSkillEvent = zodParse(UseSkillEvent, { skillId });
+  useSkill(useSkillEvent: UseSkillEvent): void {
     this.skillMutator.handleUseSkillEvent(useSkillEvent);
   }
 }

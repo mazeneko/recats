@@ -2,7 +2,9 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { LocalDateTime } from '@js-joda/core';
 
 import { skillLogic } from '../../../feature/skill/domain';
-import { Skill, SkillId } from '../../../feature/skill/domain/skill';
+import { UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
+import { Skill } from '../../../feature/skill/domain/skill';
+import { zodParse } from '../../../util/zod';
 
 /**
  * スキルリストのアイテム
@@ -29,7 +31,7 @@ export class SkillListItemUi {
   /** スキル */
   readonly skill = input.required<Skill>();
   /** スキルが使用された */
-  readonly useSkill = output<SkillId>();
+  readonly useSkill = output<UseSkillEvent>();
   /** スキルロジック */
   readonly skillLogic = skillLogic;
 
@@ -37,6 +39,7 @@ export class SkillListItemUi {
    * スキルを使用します。
    */
   emitUseSkill(): void {
-    this.useSkill.emit(this.skill().id);
+    const useSkillEvent = zodParse(UseSkillEvent, { skillId: this.skill().id });
+    this.useSkill.emit(useSkillEvent);
   }
 }
