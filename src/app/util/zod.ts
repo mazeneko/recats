@@ -13,7 +13,7 @@ import {
  * @param data parseに渡すデータ
  * @returns parseの戻り値
  */
-export function zodTypeSafeParse<T extends ZodType>(schema: T, data: z.input<T>): z.output<T> {
+export function zodParse<T extends ZodType>(schema: T, data: z.input<T>): z.output<T> {
   return schema.parse(data);
 }
 
@@ -23,7 +23,7 @@ export function zodTypeSafeParse<T extends ZodType>(schema: T, data: z.input<T>)
 export type OnlyUnknown<DUMMY> = unknown extends DUMMY ? DUMMY : never;
 
 /**
- * {@link zodTypeSafeParse}と対になるように用意している、型がわからない値のためのparseです。
+ * {@link zodParse}と対になるように用意している、型がわからない値のためのparseです。
  * unknown以外は渡せないようにしてあります。
  * @param schema parseに使うZodType
  * @param data parseに渡すデータ
