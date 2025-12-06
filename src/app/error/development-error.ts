@@ -21,7 +21,7 @@ export class DevelopmentError extends Error {
  *
  * ここに含まれる型には他と重複しないようなerrorCodeを含み、エラーを判別できるようにしてください。
  */
-export type DevelopmentErrorDetail = FocusAfterNavigationTargetMistake;
+export type DevelopmentErrorDetail = FocusAfterNavigationTargetMistake | FormDefinitionMistake;
 
 /**
  * {@link FocusAfterNavigation}の対象がHTMLElementになっていないミス
@@ -29,4 +29,15 @@ export type DevelopmentErrorDetail = FocusAfterNavigationTargetMistake;
  */
 export type FocusAfterNavigationTargetMistake = {
   readonly errorCode: 'FocusAfterNavigationTargetMistake';
+};
+
+/**
+ * フォームの定義ミス
+ *
+ * なんらかの値を作るためにフォームを定義しているとき、
+ * フォームがvalidになっているのに目的の値が作成できなかった場合に使用します。
+ */
+export type FormDefinitionMistake = {
+  readonly errorCode: 'FormDefinitionMistake';
+  readonly formValue: unknown;
 };
