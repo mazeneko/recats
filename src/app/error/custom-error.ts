@@ -1,3 +1,5 @@
+import { SkillId } from '../feature/skill/domain/skill';
+
 /**
  * カスタムエラー
  */
@@ -6,7 +8,7 @@ export class CustomError extends Error {
     /** メッセージ。ユーザーに表示されます。 */
     message: string,
     /** カスタムエラーごとに固有のデータ */
-    public readonly detail: CustomErrorDetail,
+    readonly detail: CustomErrorDetail,
     /** エラーオプション。 */
     options?: ErrorOptions,
   ) {
@@ -19,13 +21,20 @@ export class CustomError extends Error {
  *
  * ここに含まれる型には他と重複しないようなerrorCodeを含み、エラーを判別できるようにしてください。
  */
-export type CustomErrorDetail = ExampleError | ExampleError2;
+export type CustomErrorDetail = SkillNotFoundError | OutOfChargeError;
 
-export type ExampleError = {
-  readonly errorCode: 'ExampleError';
+/**
+ * スキルが見つからなかったときのエラー
+ */
+export type SkillNotFoundError = {
+  readonly errorCode: 'SkillNotFoundError';
+  readonly skillId: SkillId;
 };
 
-export type ExampleError2 = {
-  readonly errorCode: 'ExampleError2';
-  readonly amount: number;
+/**
+ * スキルのチャージがないときのエラー
+ */
+export type OutOfChargeError = {
+  readonly errorCode: 'OutOfChargeError';
+  readonly skillId: SkillId;
 };
