@@ -18,10 +18,10 @@ export const SkillCreatedAtBrand = Symbol();
 export const SkillCreatedAt = LocalDateTimeCoerce.brand<typeof SkillCreatedAtBrand>();
 export type SkillCreatedAt = z.output<typeof SkillCreatedAt>;
 
-/** スキル最終使用日時 */
-export const SkillLastUsedAtBrand = Symbol();
-export const SkillLastUsedAt = LocalDateTimeCoerce.brand<typeof SkillLastUsedAtBrand>();
-export type SkillLastUsedAt = z.output<typeof SkillLastUsedAt>;
+/** スキル使用日時 */
+export const SkillUsedAtBrand = Symbol();
+export const SkillUsedAt = LocalDateTimeCoerce.brand<typeof SkillUsedAtBrand>();
+export type SkillUsedAt = z.output<typeof SkillUsedAt>;
 
 /** チャージ数 */
 export const CastingChargeBrand = Symbol();
@@ -48,8 +48,8 @@ export const Skill = z
     name: SkillName,
     /** スキル作成日時 */
     createdAt: SkillCreatedAt,
-    /** スキル最終使用日時 */
-    lastUsedAt: SkillLastUsedAt.nullable(),
+    /** スキル使用日時 */
+    lastUsedAt: SkillUsedAt.nullable(),
     /** チャージ数 */
     castingCharge: CastingCharge,
     /** 最大チャージ数 */

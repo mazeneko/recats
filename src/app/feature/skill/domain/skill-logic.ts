@@ -3,7 +3,7 @@ import { Duration, LocalDateTime } from '@js-joda/core';
 import { recastLogic } from '.';
 import { zodParse } from '../../../util/zod';
 import { CreateSkillEvent } from './event/skill-event';
-import { Skill } from './skill';
+import { Skill, SkillCreatedAt, SkillUsedAt } from './skill';
 
 /**
  * スキルを作成します。
@@ -11,7 +11,7 @@ import { Skill } from './skill';
  * @param createdAt 作成日時
  * @returns 作成したスキル
  */
-export function createSkill(event: CreateSkillEvent, createdAt: LocalDateTime): Skill {
+export function createSkill(event: CreateSkillEvent, createdAt: SkillCreatedAt): Skill {
   return zodParse(Skill, {
     id: crypto.randomUUID(),
     name: event.name,
@@ -131,15 +131,15 @@ export function refreshCastingCharge(
 /**
  * スキルを使用します。
  * @param skill スキル
- * @param now 現在日時
+ * @param usedAt 使用日時
  * @returns 使用したあとのスキル
  */
-export function use(skill: Skill, now: LocalDateTime): Skill {
+export function use(skill: Skill, usedAt: SkillUsedAt): Skill {
   const keepRecasting = willRecastOverTime(skill); // リキャストの予定がある(途中のリキャストがある)場合はリキャストを継続します。
   return zodParse(Skill, {
     ...skill,
-    recastingFrom: keepRecasting ? skill.recastingFrom : now,
-    lastUsedAt: now,
+    recastingFrom: keepRecasting ? skill.recastingFrom : usedAt,
+    lastUsedAt: usedAt,
     castingCharge: Math.max(0, skill.castingCharge - 1),
   });
 }

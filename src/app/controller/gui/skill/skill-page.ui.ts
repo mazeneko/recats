@@ -18,7 +18,10 @@ import { SkillListUi } from './skill-list.ui';
   selector: 'app-skill-page',
   imports: [CreateSkillFormUi, SkillListUi],
   template: `
-    <app-create-skill-form (createSkill)="createSkill($event)"></app-create-skill-form>
+    <app-create-skill-form
+      [currentDateTime]="currentDateTime()"
+      (createSkill)="createSkill($event)"
+    ></app-create-skill-form>
     <app-skill-list
       [currentDateTime]="currentDateTime()"
       [skills]="skills()"

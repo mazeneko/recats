@@ -1,6 +1,5 @@
 import {
   EnvironmentProviders,
-  inject,
   Injectable,
   makeEnvironmentProviders,
   Signal,
@@ -8,7 +7,6 @@ import {
 } from '@angular/core';
 
 import { CustomError } from '../../../error/custom-error';
-import { CURRENT_DATE_TIME } from '../../../util/current-date-time-provider';
 import { skillLogic } from '../domain';
 import {
   CreateSkillEvent,
@@ -27,7 +25,6 @@ import { SKILL_MUTATOR, SKILL_READER, SkillMutator, SkillReader } from '../domai
 })
 export class InMemorySkillStore implements SkillReader, SkillMutator {
   readonly #skills = signal<Skill[]>([]);
-  readonly #currentDateTime = inject(CURRENT_DATE_TIME);
 
   skills(): Signal<Skill[]> {
     return this.#skills.asReadonly();
@@ -42,7 +39,7 @@ export class InMemorySkillStore implements SkillReader, SkillMutator {
   }
 
   async handleCreateSkillEvent(event: CreateSkillEvent): Promise<SkillId> {
-    const skill = skillLogic.createSkill(event, this.#currentDateTime());
+    const skill = skillLogic.createSkill(event, event.createdAt);
     this.#saveOrUpdate(skill);
     return skill.id;
   }
@@ -61,7 +58,7 @@ export class InMemorySkillStore implements SkillReader, SkillMutator {
         skillId: event.skillId,
       });
     }
-    const updatedSkill = skillLogic.use(skill, this.#currentDateTime());
+    const updatedSkill = skillLogic.use(skill, event.usedAt);
     this.#saveOrUpdate(updatedSkill);
   }
 

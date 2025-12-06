@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { Field, form, schema, submit } from '@angular/forms/signals';
-import { Duration } from '@js-joda/core';
+import { Duration, LocalDateTime } from '@js-joda/core';
 import z from 'zod';
 
 import { DevelopmentError } from '../../../error/development-error';
@@ -13,57 +13,6 @@ import {
 import { zodParse, zodSafeParse } from '../../../util/zod';
 import { zodFormField, zodValidate } from '../../../util/zod-angular';
 import { FieldErrorsUi } from '../parts/field-errors.ui';
-
-/** スキル作成イベントを作るためのスキル作成フォーム */
-const CreateSkillFormToEvent = z
-  .strictObject({
-    /** スキル名 */
-    name: zodFormField.string,
-    /** リキャスト秒数 */
-    recastSeconds: zodFormField.number,
-    /** 初期状態でスキルが使用可能 */
-    initiallyAvailable: zodFormField.boolean,
-    /** 最大チャージ数 */
-    castingChargeLimit: zodFormField.number,
-  })
-  .readonly()
-  .transform<CreateSkillEvent | null>((form) => {
-    const createSkillEvent = zodSafeParse(CreateSkillEvent, {
-      name: form.name,
-      recast: { recastType: 'duration', recastTime: Duration.ofSeconds(form.recastSeconds) },
-      initiallyAvailable: form.initiallyAvailable,
-      castingChargeLimit: form.castingChargeLimit,
-    });
-    return createSkillEvent.success ? createSkillEvent.data : null;
-  });
-/** スキル作成フォーム */
-export type CreateSkillForm = z.input<typeof CreateSkillFormToEvent>;
-/** スキル作成フォームのスキーマ */
-const CREATE_SKILL_FORM_SCHEMA = schema<CreateSkillForm>((schemaPath) => {
-  zodValidate(SkillName, schemaPath.name);
-  zodValidate(z.int().min(1), schemaPath.recastSeconds);
-  zodValidate(InitiallyAvailable, schemaPath.initiallyAvailable, { required: false });
-  zodValidate(CastingChargeLimit, schemaPath.castingChargeLimit);
-});
-/** スキル作成フォームのデフォルト値 */
-const CREATE_SKILL_FORM_DEFAULT: CreateSkillForm = {
-  name: '',
-  recastSeconds: NaN,
-  initiallyAvailable: false,
-  castingChargeLimit: 1,
-};
-/** スキル作成フォームの送信 */
-export interface CreateSkillSubmission {
-  /** スキル作成イベント */
-  readonly createSkillEvent: CreateSkillEvent;
-  /** 入力されたフォームの値 */
-  readonly createSkillForm: CreateSkillForm;
-  /**
-   * フォームをリセットします。
-   * @param value リセットに使う値。省略した場合は初期値となります。
-   */
-  readonly resetForm: (value?: CreateSkillForm) => void;
-}
 
 /**
  * スキル作成フォーム
@@ -113,6 +62,8 @@ export interface CreateSkillSubmission {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateSkillFormUi {
+  /** 現在日時 */
+  readonly currentDateTime = input.required<LocalDateTime>();
   /** スキル作成フォームのデフォルト値 */
   readonly createSkillFormDefault = input<CreateSkillForm>(CREATE_SKILL_FORM_DEFAULT);
   /** スキル作成フォーム */
@@ -140,15 +91,7 @@ export class CreateSkillFormUi {
     // NOTE submitメソッドによってフォームの検証やtouchedの有効化などが行われます。
     submit(this.createSkillForm, async (form) => {
       const formValue = form().value();
-      // フォームからイベントを作成します。
-      const createSkillEvent = zodParse(CreateSkillFormToEvent, formValue);
-      if (createSkillEvent === null) {
-        throw new DevelopmentError('スキル作成イベントに変換できませんでした。', {
-          errorCode: 'FormDefinitionMistake',
-          formValue: formValue,
-        });
-      }
-      // 親コンポーネントに通知します。
+      const createSkillEvent = toCreateSkillEvent(formValue, this.currentDateTime());
       this.createSkill.emit({
         createSkillEvent,
         createSkillForm: formValue,
@@ -156,4 +99,68 @@ export class CreateSkillFormUi {
       });
     });
   }
+}
+
+/** スキル作成フォーム */
+const CreateSkillForm = z
+  .strictObject({
+    /** スキル名 */
+    name: zodFormField.string,
+    /** リキャスト秒数 */
+    recastSeconds: zodFormField.number,
+    /** 初期状態でスキルが使用可能 */
+    initiallyAvailable: zodFormField.boolean,
+    /** 最大チャージ数 */
+    castingChargeLimit: zodFormField.number,
+  })
+  .readonly();
+export type CreateSkillForm = z.input<typeof CreateSkillForm>;
+/** スキル作成フォームのスキーマ */
+const CREATE_SKILL_FORM_SCHEMA = schema<CreateSkillForm>((schemaPath) => {
+  zodValidate(SkillName, schemaPath.name);
+  zodValidate(z.int().min(1), schemaPath.recastSeconds);
+  zodValidate(InitiallyAvailable, schemaPath.initiallyAvailable, { required: false });
+  zodValidate(CastingChargeLimit, schemaPath.castingChargeLimit);
+});
+/**
+ * スキル作成イベントを作成します。
+ * @param rawForm スキル作成フォーム
+ * @param now 現在日時
+ * @returns スキル作成イベント
+ */
+function toCreateSkillEvent(rawForm: CreateSkillForm, now: LocalDateTime) {
+  const form = zodParse(CreateSkillForm, rawForm);
+  const createSkillEvent = zodSafeParse(CreateSkillEvent, {
+    name: form.name,
+    recast: { recastType: 'duration', recastTime: Duration.ofSeconds(form.recastSeconds) },
+    initiallyAvailable: form.initiallyAvailable,
+    castingChargeLimit: form.castingChargeLimit,
+    createdAt: now,
+  });
+  if (!createSkillEvent.success) {
+    throw new DevelopmentError('スキル作成イベントに変換できませんでした。', {
+      errorCode: 'FormDefinitionMistake',
+      formValue: form,
+    });
+  }
+  return createSkillEvent.data;
+}
+/** スキル作成フォームのデフォルト値 */
+const CREATE_SKILL_FORM_DEFAULT: CreateSkillForm = {
+  name: '',
+  recastSeconds: NaN,
+  initiallyAvailable: false,
+  castingChargeLimit: 1,
+};
+/** スキル作成フォームの送信 */
+export interface CreateSkillSubmission {
+  /** スキル作成イベント */
+  readonly createSkillEvent: CreateSkillEvent;
+  /** 入力されたフォームの値 */
+  readonly createSkillForm: CreateSkillForm;
+  /**
+   * フォームをリセットします。
+   * @param value リセットに使う値。省略した場合は初期値となります。
+   */
+  readonly resetForm: (value?: CreateSkillForm) => void;
 }

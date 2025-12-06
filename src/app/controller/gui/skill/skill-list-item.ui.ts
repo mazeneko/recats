@@ -39,7 +39,10 @@ export class SkillListItemUi {
    * スキルを使用します。
    */
   emitUseSkill(): void {
-    const useSkillEvent = zodParse(UseSkillEvent, { skillId: this.skill().id });
+    const useSkillEvent = zodParse(UseSkillEvent, {
+      skillId: this.skill().id,
+      usedAt: this.currentDateTime(),
+    });
     this.useSkill.emit(useSkillEvent);
   }
 }

@@ -2,7 +2,14 @@ import z from 'zod';
 
 import { LocalDateTimeCoerce } from '../../../../util/zod-joda';
 import { Recast } from '../recast';
-import { CastingChargeLimit, InitiallyAvailable, SkillId, SkillName } from '../skill';
+import {
+  CastingChargeLimit,
+  InitiallyAvailable,
+  SkillCreatedAt,
+  SkillId,
+  SkillName,
+  SkillUsedAt,
+} from '../skill';
 
 /** スキルを作成するイベント */
 export const CreateSkillEventBrand = Symbol();
@@ -16,6 +23,8 @@ export const CreateSkillEvent = z
     recast: Recast,
     /** 初期状態でスキルが使用可能 */
     initiallyAvailable: InitiallyAvailable,
+    /** 作成日時 */
+    createdAt: SkillCreatedAt,
   })
   .brand<typeof CreateSkillEventBrand>()
   .readonly();
@@ -27,6 +36,8 @@ export const UseSkillEvent = z
   .strictObject({
     /** スキルID */
     skillId: SkillId,
+    /** 使用日時 */
+    usedAt: SkillUsedAt,
   })
   .brand<typeof UseSkillEventBrand>()
   .readonly();
