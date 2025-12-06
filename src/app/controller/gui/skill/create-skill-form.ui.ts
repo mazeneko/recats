@@ -14,6 +14,8 @@ import { zodParse, zodSafeParse } from '../../../util/zod';
 import { zodFormField, zodValidate } from '../../../util/zod-angular';
 import { FieldErrorsUi } from '../parts/field-errors.ui';
 
+// TODO リキャストとかちゃんと入力できるようにする
+
 /**
  * スキル作成フォーム
  */
