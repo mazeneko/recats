@@ -21,18 +21,18 @@ export interface SkillReader {
    * すべてのスキルのsignalを取得します。
    * @return すべてのスキルのsignal
    */
-  skills(): Signal<Skill[]>;
+  readonly skills: () => Signal<Skill[]>;
   /**
    * すべてのスキルを取得します。
    * @return すべてのスキル
    */
-  getAll(): Promise<Skill[]>;
+  readonly getAll: () => Promise<Skill[]>;
   /**
    * 指定したIDのスキルを取得します。
    * @param skillId スキルID
    * @returns スキル。存在しない場合はnull
    */
-  getById(skillId: SkillId): Promise<Skill | null>;
+  readonly getById: (skillId: SkillId) => Promise<Skill | null>;
 }
 
 /**
@@ -49,20 +49,20 @@ export interface SkillMutator {
    * @param event スキル作成イベント
    * @returns 作成したスキルのID
    */
-  handleCreateSkillEvent(event: CreateSkillEvent): Promise<SkillId>;
+  readonly handleCreateSkillEvent: (event: CreateSkillEvent) => Promise<SkillId>;
   /**
    * スキル使用イベントをハンドルします。
    * @param event スキル使用イベント
    */
-  handleUseSkillEvent(event: UseSkillEvent): Promise<void>;
+  readonly handleUseSkillEvent: (event: UseSkillEvent) => Promise<void>;
   /**
    * スキル削除イベントをハンドルします。
    * @param event スキル削除イベント
    */
-  handleDeleteSkillEvent(event: DeleteSkillEvent): Promise<void>;
+  readonly handleDeleteSkillEvent: (event: DeleteSkillEvent) => Promise<void>;
   /**
    * スキルのチャージを更新するイベントをハンドルします。
    * @param event スキルのチャージを更新するイベント
    */
-  handleRefreshCastingChargeEvent(event: RefreshCastingChargeEvent): Promise<void>;
+  readonly handleRefreshCastingChargeEvent: (event: RefreshCastingChargeEvent) => Promise<void>;
 }
