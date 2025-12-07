@@ -1,13 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
 
-import {
-  RefreshCastingChargeEvent,
-  UseSkillEvent,
-} from '../../../feature/skill/domain/event/skill-event';
+import { UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
 import { SKILL_MUTATOR, SKILL_READER } from '../../../feature/skill/domain/skill-store';
 import { CURRENT_DATE_TIME } from '../../../util/current-date-time-provider';
-import { zodParse } from '../../../util/zod';
 import { CreateSkillFormUi, CreateSkillSubmission } from './create-skill-form.ui';
 import { SkillListUi } from './skill-list.ui';
 
@@ -40,15 +35,6 @@ export class SkillPageUi {
   readonly skillMutator = inject(SKILL_MUTATOR);
   /** スキルのリスト */
   readonly skills = this.skillReader.skills();
-
-  constructor() {
-    // TODO サービスにうつす
-    toObservable(this.currentDateTime).subscribe((now) =>
-      this.skillMutator.handleRefreshCastingChargeEvent(
-        zodParse(RefreshCastingChargeEvent, { now }),
-      ),
-    );
-  }
 
   /**
    * スキルを作成します。
