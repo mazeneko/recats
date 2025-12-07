@@ -25,12 +25,12 @@ export type SkillUsedAt = z.output<typeof SkillUsedAt>;
 
 /** チャージ数 */
 export const CastingChargeBrand = Symbol();
-export const CastingCharge = z.int().min(0).brand<typeof CastingChargeBrand>();
+export const CastingCharge = z.int().min(0).max(1000).brand<typeof CastingChargeBrand>();
 export type CastingCharge = z.output<typeof CastingCharge>;
 
 /** 最大チャージ数 */
 export const CastingChargeLimitBrand = Symbol();
-export const CastingChargeLimit = z.int().min(1).brand<typeof CastingChargeLimitBrand>();
+export const CastingChargeLimit = z.int().min(1).max(1000).brand<typeof CastingChargeLimitBrand>();
 export type CastingChargeLimit = z.output<typeof CastingChargeLimit>;
 
 /** 初期状態でスキルが使用可能 */

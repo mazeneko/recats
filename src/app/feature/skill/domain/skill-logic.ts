@@ -3,6 +3,7 @@ import { Duration, LocalDateTime } from '@js-joda/core';
 import { recastLogic } from '.';
 import { zodParse } from '../../../util/zod';
 import { CreateSkillEvent } from './event/skill-event';
+import { RecastingFrom } from './recast';
 import { Skill, SkillCreatedAt, SkillUsedAt } from './skill';
 
 /**
@@ -69,10 +70,10 @@ export function willRecastOverTime(skill: Skill): boolean {
  * @return リキャスト完了日時。リキャストの予定がない場合はnull。
  */
 export function recastAt(skill: Skill): LocalDateTime | null {
-  if (isFullCharged(skill)) {
+  if (!recastLogic.isTimeBased(skill.recast)) {
     return null;
   }
-  if (!recastLogic.isTimeBased(skill.recast)) {
+  if (isFullCharged(skill)) {
     return null;
   }
   return recastLogic.readyAt(skill.recast, skill.recastingFrom);
@@ -85,11 +86,13 @@ export function recastAt(skill: Skill): LocalDateTime | null {
  * @returns リキャスト完了までの時間。リキャストの予定がない場合はnull。
  */
 export function untilRecast(skill: Skill, now: LocalDateTime): Duration | null {
-  const _recastAt = recastAt(skill);
-  if (_recastAt === null) {
+  if (!recastLogic.isTimeBased(skill.recast)) {
     return null;
   }
-  return Duration.between(now, _recastAt);
+  if (isFullCharged(skill)) {
+    return null;
+  }
+  return recastLogic.untilReady(skill.recast, skill.recastingFrom, now);
 }
 
 /**
@@ -102,29 +105,43 @@ export function refreshCastingCharge(
   skill: Skill,
   now: LocalDateTime,
 ): { skill: Skill; hasChange: boolean } {
-  // すでに最大チャージならチャージの更新はありません。
-  if (isFullCharged(skill)) {
+  // 時間経過によるリキャストでなければチャージの更新はありません。
+  if (!recastLogic.isTimeBased(skill.recast)) {
     return { skill, hasChange: false };
   }
-  // リキャスト完了日時を取得します。
-  const _recastAt = recastAt(skill);
-  // リキャスト完了日時がなければチャージの更新はありません。
-  if (_recastAt === null) {
-    return { skill, hasChange: false };
+  // チャージ回数を可能な限り更新します。
+  // NOTE 処理速度向上のため、関数で定義しているロジックを利用せずに実装しています。
+  let recastingFrom = skill.recastingFrom;
+  let castingCharge: number = skill.castingCharge;
+  let hasChange = false;
+  do {
+    // すでに最大チャージならチャージの更新はありません。
+    if (skill.castingChargeLimit <= castingCharge) {
+      break;
+    }
+    // リキャスト完了日時を取得します。
+    const recastAt = recastLogic.readyAt(skill.recast, recastingFrom);
+    // リキャスト中ならチャージの更新はありません。
+    if (now.isBefore(recastAt)) {
+      break;
+    }
+    // チャージを追加します。
+    recastingFrom = recastAt as RecastingFrom;
+    castingCharge++;
+    hasChange = true;
+  } while (true);
+  // 変更がなかった場合はそのままのインスタンスを返します。
+  if (!hasChange) {
+    return { skill, hasChange };
   }
-  // リキャスト中ならチャージの更新はありません。
-  const stillRecasting = now.isBefore(_recastAt);
-  if (stillRecasting) {
-    return { skill, hasChange: false };
-  }
-  // チャージを追加します。
+  // 更新後のスキルを作成します。
   return {
     skill: zodParse(Skill, {
       ...skill,
-      recastingFrom: _recastAt, // 次のリキャストのために基準日時を更新します。
-      castingCharge: skill.castingCharge + 1,
+      recastingFrom,
+      castingCharge,
     }),
-    hasChange: true,
+    hasChange,
   };
 }
 

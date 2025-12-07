@@ -1,4 +1,4 @@
-import { LocalDateTime } from '@js-joda/core';
+import { Duration, LocalDateTime } from '@js-joda/core';
 
 import { Recast, RecastingFrom, TimeBasedRecast } from './recast';
 
@@ -20,6 +20,21 @@ export function readyAt(recast: TimeBasedRecast, recastingFrom: RecastingFrom): 
         .with(recast.recastDayOfWeek)
         .with(recast.availableAt);
   }
+}
+
+/**
+ * リキャスト完了までの時間を取得します。
+ * @param recast リキャスト
+ * @param recastingFrom リキャスト基準日時
+ * @param now 現在日時
+ * @returns リキャスト完了までの時間。
+ */
+export function untilReady(
+  recast: TimeBasedRecast,
+  recastingFrom: RecastingFrom,
+  now: LocalDateTime,
+): Duration {
+  return Duration.between(now, readyAt(recast, recastingFrom));
 }
 
 /**
