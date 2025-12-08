@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { LocalDateTime } from '@js-joda/core';
 
 import { skillLogic } from '../../../feature/skill/domain';
-import { UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
+import { AddChargeEvent, UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
 import { Skill } from '../../../feature/skill/domain/skill';
 import { zodParse } from '../../../util/zod';
 
@@ -21,6 +21,9 @@ import { zodParse } from '../../../util/zod';
     <button type="button" (click)="emitUseSkill()" [disabled]="!skillLogic.hasCharge(skill())">
       Use
     </button>
+    <button type="button" (click)="emitAddCharge()" [disabled]="skillLogic.isFullCharged(skill())">
+      Add
+    </button>
   `,
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,6 +35,8 @@ export class SkillListItemUi {
   readonly skill = input.required<Skill>();
   /** スキルが使用された */
   readonly useSkill = output<UseSkillEvent>();
+  /** チャージが追加された */
+  readonly addCharge = output<AddChargeEvent>();
   /** スキルロジック */
   readonly skillLogic = skillLogic;
 
@@ -44,5 +49,15 @@ export class SkillListItemUi {
       usedAt: this.currentDateTime(),
     });
     this.useSkill.emit(useSkillEvent);
+  }
+
+  /**
+   * チャージを追加します。
+   */
+  emitAddCharge(): void {
+    const addChargeEvent = zodParse(AddChargeEvent, {
+      skillId: this.skill().id,
+    });
+    this.addCharge.emit(addChargeEvent);
   }
 }

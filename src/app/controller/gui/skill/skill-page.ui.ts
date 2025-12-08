@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
-import { UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
+import { AddChargeEvent, UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
 import { SKILL_MUTATOR, SKILL_READER } from '../../../feature/skill/domain/skill-store';
 import { CURRENT_DATE_TIME } from '../../../util/current-date-time-provider';
 import { CreateSkillFormUi, CreateSkillSubmission } from './create-skill-form.ui';
@@ -21,6 +21,7 @@ import { SkillListUi } from './skill-list.ui';
       [currentDateTime]="currentDateTime()"
       [skills]="skills()"
       (useSkill)="useSkill($event)"
+      (addCharge)="addCharge($event)"
     ></app-skill-list>
   `,
   styles: ``,
@@ -51,5 +52,13 @@ export class SkillPageUi {
    */
   useSkill(useSkillEvent: UseSkillEvent): void {
     this.skillMutator.handleUseSkillEvent(useSkillEvent);
+  }
+
+  /**
+   * チャージを追加します。
+   * @param addChargeEvent チャージ追加イベント
+   */
+  addCharge(addChargeEvent: AddChargeEvent): void {
+    this.skillMutator.handleAddChargeEvent(addChargeEvent);
   }
 }

@@ -9,6 +9,7 @@ import {
 import { CustomError } from '../../../error/custom-error';
 import { skillLogic } from '../domain';
 import {
+  AddChargeEvent,
   CreateSkillEvent,
   DeleteSkillEvent,
   RefreshCastingChargeEvent,
@@ -72,6 +73,22 @@ export class InMemorySkillStore implements SkillReader, SkillMutator {
       .map((skill) => skillLogic.refreshCastingCharge(skill, event.now))
       .filter((refreshed) => refreshed.hasChange)
       .forEach((refreshed) => this.#saveOrUpdate(refreshed.skill));
+  }
+
+  async handleAddChargeEvent(event: AddChargeEvent): Promise<void> {
+    const skill = await this.getById(event.skillId);
+    if (skill == null) {
+      throw new CustomError(`ID[${event.skillId}]のスキルが見つかりません。`, {
+        errorCode: 'SkillNotFoundError',
+        skillId: event.skillId,
+      });
+    }
+    if (skillLogic.isFullCharged(skill)) {
+      // TODO 例外にする？
+      return;
+    }
+    const chargedSkill = skillLogic.safeIncrementCastingCharge(skill);
+    this.#saveOrUpdate(chargedSkill);
   }
 
   async #saveOrUpdate(skill: Skill): Promise<void> {

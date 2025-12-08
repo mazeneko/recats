@@ -1,6 +1,7 @@
 import { InjectionToken, Signal } from '@angular/core';
 
 import {
+  AddChargeEvent,
   CreateSkillEvent,
   DeleteSkillEvent,
   RefreshCastingChargeEvent,
@@ -65,4 +66,9 @@ export interface SkillMutator {
    * @param event スキルのチャージを更新するイベント
    */
   readonly handleRefreshCastingChargeEvent: (event: RefreshCastingChargeEvent) => Promise<void>;
+  /**
+   * チャージ追加イベントをハンドルします。
+   * @param event チャージ追加イベント
+   */
+  readonly handleAddChargeEvent: (event: AddChargeEvent) => Promise<void>;
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { LocalDateTime } from '@js-joda/core';
 
-import { UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
+import { AddChargeEvent, UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
 import { Skill } from '../../../feature/skill/domain/skill';
 import { SkillListItemUi } from './skill-list-item.ui';
 
@@ -18,6 +18,7 @@ import { SkillListItemUi } from './skill-list-item.ui';
           [currentDateTime]="currentDateTime()"
           [skill]="skill"
           (useSkill)="emitUseSkill($event)"
+          (addCharge)="emitAddCharge($event)"
         ></app-skill-list-item>
       }
     </div>
@@ -32,6 +33,8 @@ export class SkillListUi {
   readonly skills = input.required<Skill[]>();
   /** スキルが使用された */
   readonly useSkill = output<UseSkillEvent>();
+  /** チャージが追加された */
+  readonly addCharge = output<AddChargeEvent>();
 
   /**
    * スキルを使用します。
@@ -39,5 +42,13 @@ export class SkillListUi {
    */
   emitUseSkill(useSkillEvent: UseSkillEvent): void {
     this.useSkill.emit(useSkillEvent);
+  }
+
+  /**
+   * チャージを追加します。
+   * @param addChargeEvent チャージ追加イベント
+   */
+  emitAddCharge(addChargeEvent: AddChargeEvent): void {
+    this.addCharge.emit(addChargeEvent);
   }
 }

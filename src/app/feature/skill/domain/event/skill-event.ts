@@ -64,3 +64,14 @@ export const RefreshCastingChargeEvent = z
   .brand<typeof RefreshCastingChargeEventBrand>()
   .readonly();
 export type RefreshCastingChargeEvent = z.output<typeof RefreshCastingChargeEvent>;
+
+/** スキルのチャージを追加するイベント */
+export const AddChargeEventBrand = Symbol();
+export const AddChargeEvent = z
+  .strictObject({
+    /** スキルID */
+    skillId: SkillId,
+  })
+  .brand<typeof AddChargeEventBrand>()
+  .readonly();
+export type AddChargeEvent = z.output<typeof AddChargeEvent>;
