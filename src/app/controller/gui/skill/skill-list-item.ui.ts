@@ -2,7 +2,11 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { LocalDateTime } from '@js-joda/core';
 
 import { skillLogic } from '../../../feature/skill/domain';
-import { AddChargeEvent, UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
+import {
+  AddChargeEvent,
+  DeleteSkillEvent,
+  UseSkillEvent,
+} from '../../../feature/skill/domain/event/skill-event';
 import { Skill } from '../../../feature/skill/domain/skill';
 import { zodParse } from '../../../util/zod';
 
@@ -24,6 +28,7 @@ import { zodParse } from '../../../util/zod';
     <button type="button" (click)="emitAddCharge()" [disabled]="skillLogic.isFullCharged(skill())">
       Add
     </button>
+    <button type="button" (click)="emitDeleteSkill()">Delete</button>
   `,
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,6 +42,8 @@ export class SkillListItemUi {
   readonly useSkill = output<UseSkillEvent>();
   /** チャージが追加された */
   readonly addCharge = output<AddChargeEvent>();
+  /** チャージが削除された */
+  readonly deleteSkill = output<DeleteSkillEvent>();
   /** スキルロジック */
   readonly skillLogic = skillLogic;
 
@@ -59,5 +66,15 @@ export class SkillListItemUi {
       skillId: this.skill().id,
     });
     this.addCharge.emit(addChargeEvent);
+  }
+
+  /**
+   * スキルを削除します。
+   */
+  emitDeleteSkill(): void {
+    const deleteSkillEvent = zodParse(DeleteSkillEvent, {
+      skillId: this.skill().id,
+    });
+    this.deleteSkill.emit(deleteSkillEvent);
   }
 }
