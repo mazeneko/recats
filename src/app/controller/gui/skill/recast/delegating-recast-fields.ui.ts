@@ -30,9 +30,9 @@ import {
       <app-field-errors [fieldState]="fields().recastType()"></app-field-errors>
     </div>
     <!-- 時間によるリキャスト -->
-    @if (!fields().durationRecastForm().hidden()) {
+    @if (!fields().durationRecastFields().hidden()) {
       <app-duration-recast-fields
-        [fields]="fields().durationRecastForm"
+        [fields]="fields().durationRecastFields"
       ></app-duration-recast-fields>
     }
     <!-- 日によるリキャスト -->
@@ -56,7 +56,7 @@ export const DelegatingRecastFields = z
     /** リキャストタイプ */
     recastType: zodFormField.string(),
     /** 時間によるリキャストフォーム */
-    durationRecastForm: DurationRecastFields,
+    durationRecastFields: DurationRecastFields,
     /** 日によるリキャストフォーム */
     // TODO まだ作ってない
     /** 週によるリキャストフォーム */
@@ -68,9 +68,9 @@ export type DelegatingRecastFields = z.input<typeof DelegatingRecastFields>;
 /** リキャストのフィールドのスキーマ */
 export const DELEGATING_RECAST_FIELDS_SCHEMA = schema<DelegatingRecastFields>((schemaPath) => {
   zodValidate(RecastType, schemaPath.recastType);
-  apply(schemaPath.durationRecastForm, DURATION_RECAST_FIELDS_SCHEMA);
+  apply(schemaPath.durationRecastFields, DURATION_RECAST_FIELDS_SCHEMA);
   hidden(
-    schemaPath.durationRecastForm,
+    schemaPath.durationRecastFields,
     ({ valueOf }) => valueOf(schemaPath.recastType) !== RecastType.enum.duration,
   );
   // TODO 日
@@ -94,7 +94,7 @@ export function toRecast(fieldsValue: DelegatingRecastFields): Recast {
   // リキャストを作成します。
   switch (recastType.data) {
     case 'duration':
-      return toDurationRecast(fieldsValue.durationRecastForm);
+      return toDurationRecast(fieldsValue.durationRecastFields);
     case 'daily':
       return zodParse(ManualRecast, { recastType: 'manual' }); // TODO まだ作ってない
     case 'weekly':
@@ -107,5 +107,5 @@ export function toRecast(fieldsValue: DelegatingRecastFields): Recast {
 /** 時間によるリキャストのフィールドのデフォルト値 */
 export const DELEGATING_RECAST_FIELDS_DEFAULT: DelegatingRecastFields = {
   recastType: RecastType.enum.duration,
-  durationRecastForm: DURATION_RECAST_FIELDS_DEFAULT,
+  durationRecastFields: DURATION_RECAST_FIELDS_DEFAULT,
 };
