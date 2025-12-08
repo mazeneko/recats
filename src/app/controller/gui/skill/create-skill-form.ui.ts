@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
-import { Field, form, schema, submit } from '@angular/forms/signals';
-import { Duration, LocalDateTime } from '@js-joda/core';
+import { apply, Field, form, schema, submit } from '@angular/forms/signals';
+import { LocalDateTime } from '@js-joda/core';
 import z from 'zod';
 
 import { DevelopmentError } from '../../../error/development-error';
@@ -13,15 +13,20 @@ import {
 import { zodParse, zodSafeParse } from '../../../util/zod';
 import { zodFormField, zodValidate } from '../../../util/zod-angular';
 import { FieldErrorsUi } from '../parts/field-errors.ui';
-
-// TODO リキャストとかちゃんと入力できるようにする
+import {
+  DELEGATING_RECAST_FIELDS_DEFAULT,
+  DELEGATING_RECAST_FIELDS_SCHEMA,
+  DelegatingRecastFields,
+  DelegatingRecastFieldsUi,
+  toRecast,
+} from './recast/delegating-recast-fields.ui';
 
 /**
  * スキル作成フォーム
  */
 @Component({
   selector: 'app-create-skill-form',
-  imports: [Field, FieldErrorsUi],
+  imports: [Field, FieldErrorsUi, DelegatingRecastFieldsUi],
   template: `
     <form novalidate (submit)="$event.preventDefault(); emitCreateSkill()" class="flex flex-col">
       <!-- 名前 -->
@@ -29,16 +34,10 @@ import { FieldErrorsUi } from '../parts/field-errors.ui';
         <label>Name:<input type="text" [field]="createSkillForm.name" placeholder="Name" /></label>
         <app-field-errors [fieldState]="createSkillForm.name()"></app-field-errors>
       </div>
-      <!-- リキャスト秒数 -->
-      <div>
-        <label
-          >Recast (seconds):<input
-            type="number"
-            [field]="createSkillForm.recastSeconds"
-            placeholder="Recast (seconds)"
-        /></label>
-        <app-field-errors [fieldState]="createSkillForm.recastSeconds()"></app-field-errors>
-      </div>
+      <!-- リキャスト -->
+      <app-delegating-recast-fields
+        [fields]="createSkillForm.delegatingRecastFields"
+      ></app-delegating-recast-fields>
       <!-- 初期状態でスキルが使用可能 -->
       <div>
         <label
@@ -107,34 +106,38 @@ export class CreateSkillFormUi {
 const CreateSkillForm = z
   .strictObject({
     /** スキル名 */
-    name: zodFormField.string,
-    /** リキャスト秒数 */
-    recastSeconds: zodFormField.number,
+    name: zodFormField.string(),
+    /** リキャストのフィールド */
+    delegatingRecastFields: DelegatingRecastFields,
     /** 初期状態でスキルが使用可能 */
-    initiallyAvailable: zodFormField.boolean,
+    initiallyAvailable: zodFormField.boolean(),
     /** 最大チャージ数 */
-    castingChargeLimit: zodFormField.number,
+    castingChargeLimit: zodFormField.number(),
   })
   .readonly();
 export type CreateSkillForm = z.input<typeof CreateSkillForm>;
+
 /** スキル作成フォームのスキーマ */
 const CREATE_SKILL_FORM_SCHEMA = schema<CreateSkillForm>((schemaPath) => {
   zodValidate(SkillName, schemaPath.name);
-  zodValidate(z.int().min(1), schemaPath.recastSeconds);
+  apply(schemaPath.delegatingRecastFields, DELEGATING_RECAST_FIELDS_SCHEMA);
   zodValidate(InitiallyAvailable, schemaPath.initiallyAvailable, { required: false });
   zodValidate(CastingChargeLimit, schemaPath.castingChargeLimit);
 });
+
 /**
  * スキル作成イベントを作成します。
- * @param rawForm スキル作成フォーム
+ * @param formValue スキル作成フォーム
  * @param now 現在日時
  * @returns スキル作成イベント
  */
-function toCreateSkillEvent(rawForm: CreateSkillForm, now: LocalDateTime) {
-  const form = zodParse(CreateSkillForm, rawForm);
+function toCreateSkillEvent(formValue: CreateSkillForm, now: LocalDateTime): CreateSkillEvent {
+  const form = zodParse(CreateSkillForm, formValue);
+  const recast = toRecast(formValue.delegatingRecastFields);
+  // スキル作成イベントを作成します。
   const createSkillEvent = zodSafeParse(CreateSkillEvent, {
     name: form.name,
-    recast: { recastType: 'duration', recastTime: Duration.ofSeconds(form.recastSeconds) },
+    recast,
     initiallyAvailable: form.initiallyAvailable,
     castingChargeLimit: form.castingChargeLimit,
     createdAt: now,
@@ -142,18 +145,20 @@ function toCreateSkillEvent(rawForm: CreateSkillForm, now: LocalDateTime) {
   if (!createSkillEvent.success) {
     throw new DevelopmentError('スキル作成イベントに変換できませんでした。', {
       errorCode: 'FormDefinitionMistake',
-      formValue: form,
+      formValue,
     });
   }
   return createSkillEvent.data;
 }
+
 /** スキル作成フォームのデフォルト値 */
 const CREATE_SKILL_FORM_DEFAULT: CreateSkillForm = {
   name: '',
-  recastSeconds: NaN,
+  delegatingRecastFields: DELEGATING_RECAST_FIELDS_DEFAULT,
   initiallyAvailable: false,
   castingChargeLimit: 1,
 };
+
 /** スキル作成フォームの送信 */
 export interface CreateSkillSubmission {
   /** スキル作成イベント */
