@@ -4,7 +4,7 @@ import {
   AddChargeEvent,
   CreateSkillEvent,
   DeleteSkillEvent,
-  RefreshCastingChargeEvent,
+  RefreshChargeEvent,
   UseSkillEvent,
 } from './event/skill-event';
 import { Skill, SkillId } from './skill';
@@ -65,7 +65,7 @@ export interface SkillMutator {
    * スキルのチャージを更新するイベントをハンドルします。
    * @param event スキルのチャージを更新するイベント
    */
-  readonly handleRefreshCastingChargeEvent: (event: RefreshCastingChargeEvent) => Promise<void>;
+  readonly handleRefreshChargeEvent: (event: RefreshChargeEvent) => Promise<void>;
   /**
    * チャージ追加イベントをハンドルします。
    * @param event チャージ追加イベント

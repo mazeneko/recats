@@ -6,7 +6,7 @@ import {
   untracked,
 } from '@angular/core';
 
-import { RefreshCastingChargeEvent } from '../../feature/skill/domain/event/skill-event';
+import { RefreshChargeEvent } from '../../feature/skill/domain/event/skill-event';
 import { SKILL_MUTATOR } from '../../feature/skill/domain/skill-store';
 import { CURRENT_DATE_TIME } from '../../util/current-date-time-provider';
 import { zodParse } from '../../util/zod';
@@ -21,8 +21,8 @@ export function provideRefreshCastingChargeAutomation(): EnvironmentProviders {
     effect(() => {
       const now = currentDateTime();
       untracked(() => {
-        const refreshEvent = zodParse(RefreshCastingChargeEvent, { now });
-        skillMutator.handleRefreshCastingChargeEvent(refreshEvent);
+        const refreshEvent = zodParse(RefreshChargeEvent, { now });
+        skillMutator.handleRefreshChargeEvent(refreshEvent);
       });
     });
   });

@@ -12,7 +12,7 @@ import {
   AddChargeEvent,
   CreateSkillEvent,
   DeleteSkillEvent,
-  RefreshCastingChargeEvent,
+  RefreshChargeEvent,
   UseSkillEvent,
 } from '../domain/event/skill-event';
 import { Skill, SkillId } from '../domain/skill';
@@ -67,7 +67,7 @@ export class InMemorySkillStore implements SkillReader, SkillMutator {
     await this.#delete(event.skillId);
   }
 
-  async handleRefreshCastingChargeEvent(event: RefreshCastingChargeEvent): Promise<void> {
+  async handleRefreshChargeEvent(event: RefreshChargeEvent): Promise<void> {
     const skills = await this.getAll();
     skills
       .map((skill) => skillLogic.refreshCastingCharge(skill, event.now))

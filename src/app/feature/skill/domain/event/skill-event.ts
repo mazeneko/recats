@@ -55,15 +55,15 @@ export const DeleteSkillEvent = z
 export type DeleteSkillEvent = z.output<typeof DeleteSkillEvent>;
 
 /** スキルのチャージを更新するイベント */
-export const RefreshCastingChargeEventBrand = Symbol();
-export const RefreshCastingChargeEvent = z
+export const RefreshChargeEventBrand = Symbol();
+export const RefreshChargeEvent = z
   .strictObject({
     /** 現在日時 */
     now: LocalDateTimeCoerce,
   })
-  .brand<typeof RefreshCastingChargeEventBrand>()
+  .brand<typeof RefreshChargeEventBrand>()
   .readonly();
-export type RefreshCastingChargeEvent = z.output<typeof RefreshCastingChargeEvent>;
+export type RefreshChargeEvent = z.output<typeof RefreshChargeEvent>;
 
 /** スキルのチャージを追加するイベント */
 export const AddChargeEventBrand = Symbol();
