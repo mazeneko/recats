@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { applyWhen, Field, FieldTree, schema } from '@angular/forms/signals';
+import { apply, Field, FieldTree, hidden, schema } from '@angular/forms/signals';
 import z from 'zod';
 
 import { DevelopmentError } from '../../../../error/development-error';
@@ -29,23 +29,16 @@ import {
       </select>
       <app-field-errors [fieldState]="fields().recastType()"></app-field-errors>
     </div>
-    <!-- 各リキャスト -->
-    @switch (fields().recastType().value()) {
-      <!-- 時間によるリキャスト -->
-      @case (RecastType.enum.duration) {
-        <app-duration-recast-fields
-          [fields]="fields().durationRecastForm"
-        ></app-duration-recast-fields>
-      }
-      <!-- 日によるリキャスト -->
-      @case (RecastType.enum.daily) {
-        <!-- // TODO まだ作ってない -->
-      }
-      <!-- 週によるリキャスト -->
-      @case (RecastType.enum.weekly) {
-        <!-- // TODO まだ作ってない -->
-      }
+    <!-- 時間によるリキャスト -->
+    @if (!fields().durationRecastForm().hidden()) {
+      <app-duration-recast-fields
+        [fields]="fields().durationRecastForm"
+      ></app-duration-recast-fields>
     }
+    <!-- 日によるリキャスト -->
+    <!-- // TODO まだ作ってない -->
+    <!-- 週によるリキャスト -->
+    <!-- // TODO まだ作ってない -->
   `,
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,10 +68,10 @@ export type DelegatingRecastFields = z.input<typeof DelegatingRecastFields>;
 /** リキャストのフィールドのスキーマ */
 export const DELEGATING_RECAST_FIELDS_SCHEMA = schema<DelegatingRecastFields>((schemaPath) => {
   zodValidate(RecastType, schemaPath.recastType);
-  applyWhen(
+  apply(schemaPath.durationRecastForm, DURATION_RECAST_FIELDS_SCHEMA);
+  hidden(
     schemaPath.durationRecastForm,
-    ({ valueOf }) => valueOf(schemaPath.recastType) === RecastType.enum.duration,
-    DURATION_RECAST_FIELDS_SCHEMA,
+    ({ valueOf }) => valueOf(schemaPath.recastType) !== RecastType.enum.duration,
   );
   // TODO 日
   // TODO 週
