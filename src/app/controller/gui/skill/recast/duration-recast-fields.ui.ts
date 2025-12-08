@@ -16,6 +16,7 @@ import { FieldErrorsUi } from '../../parts/field-errors.ui';
   selector: 'app-duration-recast-fields',
   imports: [Field, FieldErrorsUi],
   template: `
+    <!-- リキャスト日数 -->
     <div>
       <label
         >Recast (days):<input
@@ -25,6 +26,7 @@ import { FieldErrorsUi } from '../../parts/field-errors.ui';
       /></label>
       <app-field-errors [fieldState]="fields().recastDays()"></app-field-errors>
     </div>
+    <!-- リキャスト時間数 -->
     <div>
       <label
         >Recast (hours):<input
@@ -34,6 +36,7 @@ import { FieldErrorsUi } from '../../parts/field-errors.ui';
       /></label>
       <app-field-errors [fieldState]="fields().recastHours()"></app-field-errors>
     </div>
+    <!-- リキャスト分数 -->
     <div>
       <label
         >Recast (minutes):<input
@@ -43,6 +46,7 @@ import { FieldErrorsUi } from '../../parts/field-errors.ui';
       /></label>
       <app-field-errors [fieldState]="fields().recastMinutes()"></app-field-errors>
     </div>
+    <!-- リキャスト秒数 -->
     <div>
       <label
         >Recast (seconds):<input
@@ -52,13 +56,14 @@ import { FieldErrorsUi } from '../../parts/field-errors.ui';
       /></label>
       <app-field-errors [fieldState]="fields().recastSeconds()"></app-field-errors>
     </div>
+    <!-- クロスフィールドエラー -->
     <app-field-errors [fieldState]="fields()()"></app-field-errors>
   `,
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DurationRecastFieldsUi {
-  // TODO コメント
+  /** 時間によるリキャストのフィールド */
   readonly fields = input.required<FieldTree<DurationRecastFields>>();
 }
 
