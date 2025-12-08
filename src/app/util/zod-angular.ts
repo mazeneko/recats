@@ -68,9 +68,9 @@ export const zodFormField = {
  * @param field フォームフィールド
  * @param options オプション
  */
-export function zodValidate<T extends z.ZodType<O, I>, O, I extends string | number | boolean>(
+export function zodValidate<T extends z.ZodType>(
   zodType: T,
-  field: SchemaPath<I>,
+  field: SchemaPath<unknown>,
   options?: {
     /** 必須。デフォルトは`true` */
     required?: boolean;

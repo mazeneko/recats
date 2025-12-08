@@ -24,20 +24,20 @@ export const AvailableAtBrand = Symbol();
 export const AvailableAt = LocalTimeCoerce.brand<typeof AvailableAtBrand>();
 export type AvailableAt = z.output<typeof AvailableAt>;
 
-/** リキャスト日数 */
-export const RecastDaysBrand = Symbol();
-export const RecastDays = z.number().min(1).brand<typeof RecastDaysBrand>();
-export type RecastDays = z.output<typeof RecastDays>;
-
-/** リキャスト週数 */
-export const RecastWeeksBrand = Symbol();
-export const RecastWeeks = z.number().min(1).brand<typeof RecastWeeksBrand>();
-export type RecastWeeks = z.output<typeof RecastWeeks>;
-
-/** リキャスト曜日 */
+/** リキャスト完了曜日 */
 export const RecastDayOfWeekBrand = Symbol();
 export const RecastDayOfWeek = DayOfWeekCoerce.brand<typeof RecastDayOfWeekBrand>();
 export type RecastDayOfWeek = z.output<typeof RecastDayOfWeek>;
+
+/** インターバル日数 */
+export const IntervalDaysBrand = Symbol();
+export const IntervalDays = z.number().min(0).brand<typeof IntervalDaysBrand>();
+export type IntervalDays = z.output<typeof IntervalDays>;
+
+/** インターバル週数 */
+export const IntervalWeeksBrand = Symbol();
+export const IntervalWeeks = z.number().min(0).brand<typeof IntervalWeeksBrand>();
+export type IntervalWeeks = z.output<typeof IntervalWeeks>;
 
 /** リキャストタイプ */
 export const RecastType = z.enum(['duration', 'daily', 'weekly', 'manual']);
@@ -62,10 +62,10 @@ export const DailyRecast = z
   .strictObject({
     /** リキャストタイプ */
     recastType: z.literal(RecastType.enum.daily),
-    /** リキャスト日数 */
-    recastDays: RecastDays,
     /** リキャスト完了時刻 */
     availableAt: AvailableAt,
+    /** インターバル日数 */
+    intervalDays: IntervalDays,
   })
   .brand<typeof DailyRecastBrand>()
   .readonly();
@@ -77,12 +77,12 @@ export const WeeklyRecast = z
   .strictObject({
     /** リキャストタイプ */
     recastType: z.literal(RecastType.enum.weekly),
-    /** リキャスト週数 */
-    recastWeeks: RecastWeeks,
-    /** リキャスト曜日 */
+    /** リキャスト完了曜日 */
     recastDayOfWeek: RecastDayOfWeek,
     /** リキャスト完了時刻 */
     availableAt: AvailableAt,
+    /** インターバル週数 */
+    intervalWeeks: IntervalWeeks,
   })
   .brand<typeof WeeklyRecastBrand>()
   .readonly();

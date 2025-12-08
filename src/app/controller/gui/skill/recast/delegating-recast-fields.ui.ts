@@ -8,6 +8,13 @@ import { zodParse, zodUnknownSafeParse } from '../../../../util/zod';
 import { zodFormField, zodValidate } from '../../../../util/zod-angular';
 import { FieldErrorsUi } from '../../parts/field-errors.ui';
 import {
+  DAILY_RECAST_FIELDS_DEFAULT,
+  DAILY_RECAST_FIELDS_SCHEMA,
+  DailyRecastFields,
+  DailyRecastFieldsUi,
+  toDailyRecast,
+} from './daily-recast-fields.ui';
+import {
   DURATION_RECAST_FIELDS_DEFAULT,
   DURATION_RECAST_FIELDS_SCHEMA,
   DurationRecastFields,
@@ -15,10 +22,12 @@ import {
   toDurationRecast,
 } from './duration-recast-fields.ui';
 
-// TODO コメント
+/**
+ * リキャストのフィールド
+ */
 @Component({
   selector: 'app-delegating-recast-fields',
-  imports: [Field, FieldErrorsUi, DurationRecastFieldsUi],
+  imports: [Field, FieldErrorsUi, DurationRecastFieldsUi, DailyRecastFieldsUi],
   template: `
     <!-- リキャストタイプ -->
     <div>
@@ -36,7 +45,9 @@ import {
       ></app-duration-recast-fields>
     }
     <!-- 日によるリキャスト -->
-    <!-- // TODO まだ作ってない -->
+    @if (!fields().dailyRecastFields().hidden()) {
+      <app-daily-recast-fields [fields]="fields().dailyRecastFields"></app-daily-recast-fields>
+    }
     <!-- 週によるリキャスト -->
     <!-- // TODO まだ作ってない -->
   `,
@@ -44,9 +55,9 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DelegatingRecastFieldsUi {
-  // TODO コメント
+  /** リキャストのフィールド */
   readonly fields = input.required<FieldTree<DelegatingRecastFields>>();
-  // TODO コメント
+  /** リキャストタイプ */
   readonly RecastType = RecastType;
 }
 
@@ -58,7 +69,7 @@ export const DelegatingRecastFields = z
     /** 時間によるリキャストフォーム */
     durationRecastFields: DurationRecastFields,
     /** 日によるリキャストフォーム */
-    // TODO まだ作ってない
+    dailyRecastFields: DailyRecastFields,
     /** 週によるリキャストフォーム */
     // TODO まだ作ってない
   })
@@ -68,13 +79,20 @@ export type DelegatingRecastFields = z.input<typeof DelegatingRecastFields>;
 /** リキャストのフィールドのスキーマ */
 export const DELEGATING_RECAST_FIELDS_SCHEMA = schema<DelegatingRecastFields>((schemaPath) => {
   zodValidate(RecastType, schemaPath.recastType);
+  // 時間によるリキャスト
   apply(schemaPath.durationRecastFields, DURATION_RECAST_FIELDS_SCHEMA);
   hidden(
     schemaPath.durationRecastFields,
     ({ valueOf }) => valueOf(schemaPath.recastType) !== RecastType.enum.duration,
   );
-  // TODO 日
-  // TODO 週
+  // 日によるリキャスト
+  apply(schemaPath.dailyRecastFields, DAILY_RECAST_FIELDS_SCHEMA);
+  hidden(
+    schemaPath.dailyRecastFields,
+    ({ valueOf }) => valueOf(schemaPath.recastType) !== RecastType.enum.daily,
+  );
+  // 週によるリキャスト
+  // TODO
 });
 
 /**
@@ -96,7 +114,7 @@ export function toRecast(fieldsValue: DelegatingRecastFields): Recast {
     case 'duration':
       return toDurationRecast(fieldsValue.durationRecastFields);
     case 'daily':
-      return zodParse(ManualRecast, { recastType: 'manual' }); // TODO まだ作ってない
+      return toDailyRecast(fieldsValue.dailyRecastFields);
     case 'weekly':
       return zodParse(ManualRecast, { recastType: 'manual' }); // TODO まだ作ってない
     case 'manual':
@@ -108,4 +126,5 @@ export function toRecast(fieldsValue: DelegatingRecastFields): Recast {
 export const DELEGATING_RECAST_FIELDS_DEFAULT: DelegatingRecastFields = {
   recastType: RecastType.enum.duration,
   durationRecastFields: DURATION_RECAST_FIELDS_DEFAULT,
+  dailyRecastFields: DAILY_RECAST_FIELDS_DEFAULT,
 };

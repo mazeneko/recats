@@ -1,4 +1,4 @@
-import { Duration, LocalDateTime } from '@js-joda/core';
+import { Duration, LocalDateTime, TemporalAdjusters } from '@js-joda/core';
 
 import { Recast, RecastingFrom, TimeBasedRecast } from './recast';
 
@@ -12,13 +12,21 @@ export function readyAt(recast: TimeBasedRecast, recastingFrom: RecastingFrom): 
   switch (recast.recastType) {
     case 'duration':
       return recastingFrom.plus(recast.recastTime);
-    case 'daily':
-      return recastingFrom.plusDays(recast.recastDays).with(recast.availableAt);
-    case 'weekly':
+    case 'daily': {
+      const shouldRollToNextDay = recast.availableAt.isBefore(recastingFrom.toLocalTime());
+      const daysToAdd = recast.intervalDays + (shouldRollToNextDay ? 1 : 0);
+      return recastingFrom.plusDays(daysToAdd).with(recast.availableAt);
+    }
+    case 'weekly': {
+      const shouldRollToNextWeek =
+        recast.recastDayOfWeek.compareTo(recastingFrom.dayOfWeek()) === 0 &&
+        recast.availableAt.isBefore(recastingFrom.toLocalTime());
+      const weeksToAdd = recast.intervalWeeks + (shouldRollToNextWeek ? 1 : 0);
       return recastingFrom
-        .plusWeeks(recast.recastWeeks)
-        .with(recast.recastDayOfWeek)
+        .plusWeeks(weeksToAdd)
+        .with(TemporalAdjusters.nextOrSame(recast.recastDayOfWeek))
         .with(recast.availableAt);
+    }
   }
 }
 
