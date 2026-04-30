@@ -21,11 +21,11 @@ export class CustomError extends Error {
  */
 export type CustomErrorDetail = ExampleError | ExampleError2;
 
-export type ExampleError = {
+export interface ExampleError {
   readonly errorCode: 'ExampleError';
-};
+}
 
-export type ExampleError2 = {
+export interface ExampleError2 {
   readonly errorCode: 'ExampleError2';
   readonly amount: number;
-};
+}
