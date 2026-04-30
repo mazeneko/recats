@@ -6,7 +6,7 @@ export class CustomError extends Error {
     /** メッセージ。ユーザーに表示されます。 */
     message: string,
     /** カスタムエラーごとに固有のデータ */
-    public readonly detail: CustomErrorDetail,
+    readonly detail: CustomErrorDetail,
     /** エラーオプション。 */
     options?: ErrorOptions,
   ) {
