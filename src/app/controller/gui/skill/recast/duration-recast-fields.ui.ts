@@ -93,7 +93,7 @@ export const DURATION_RECAST_FIELDS_SCHEMA = schema<DurationRecastFields>((schem
       valueOf(schemaPath.recastHours),
       valueOf(schemaPath.recastMinutes),
       valueOf(schemaPath.recastSeconds),
-    ].some((value) => 1 <= value);
+    ].some((value) => value != null && 1 <= value);
     if (hasDuration) {
       return null;
     }
@@ -134,9 +134,9 @@ export function toDurationRecast(fieldsValue: DurationRecastFields): DurationRec
  */
 export function defaultDurationRecastFields(): DurationRecastFields {
   return {
-    recastDays: NaN,
-    recastHours: NaN,
-    recastMinutes: NaN,
-    recastSeconds: NaN,
+    recastDays: null,
+    recastHours: null,
+    recastMinutes: null,
+    recastSeconds: null,
   };
 }
