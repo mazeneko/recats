@@ -6,6 +6,15 @@ export const ZodLocalTime = z.custom<LocalTime>((it) => it instanceof LocalTime)
 export const ZodLocalDateTime = z.custom<LocalDateTime>((it) => it instanceof LocalDateTime);
 export const ZodDuration = z.custom<Duration>((it) => it instanceof Duration);
 export const ZodDayOfWeek = z.custom<DayOfWeek>((it) => it instanceof DayOfWeek);
+export const ZodDayOfWeekEnum = z.enum([
+  'MONDAY', // DayOfWeek.MONDAY.name(),
+  'TUESDAY', // DayOfWeek.TUESDAY.name(),
+  'WEDNESDAY', // DayOfWeek.WEDNESDAY.name(),
+  'THURSDAY', // DayOfWeek.THURSDAY.name(),
+  'FRIDAY', // DayOfWeek.FRIDAY.name(),
+  'SATURDAY', // DayOfWeek.SATURDAY.name(),
+  'SUNDAY', // DayOfWeek.SUNDAY.name(),
+]);
 export const ZodDayOfWeekJSON = z.string().refine((it) => {
   try {
     DayOfWeek.valueOf(it);
@@ -99,7 +108,7 @@ export const DurationCoerce = z
  * - 曜日文字列
  */
 export const DayOfWeekCoerce = z
-  .union([ZodDayOfWeek, ZodDayOfWeekJSON])
+  .union([ZodDayOfWeek, ZodDayOfWeekEnum, ZodDayOfWeekJSON])
   .transform<DayOfWeek>((value) => {
     if (value instanceof DayOfWeek) {
       return value;
