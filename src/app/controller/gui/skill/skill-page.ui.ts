@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 
 import { form, FormRoot } from '@angular/forms/signals';
 import {
@@ -16,6 +16,7 @@ import {
   defaultCreateSkillForm,
   toCreateSkillEvent,
 } from './create-skill-form-fields.ui';
+import { SkillDetailUi } from './skill-detail.ui';
 import { SkillListUi } from './skill-list.ui';
 
 /**
@@ -23,22 +24,36 @@ import { SkillListUi } from './skill-list.ui';
  */
 @Component({
   selector: 'app-skill-page',
-  imports: [CreateSkillFormFieldsUi, SkillListUi, FormRoot],
+  imports: [FormRoot, CreateSkillFormFieldsUi, SkillListUi, SkillDetailUi],
   template: `
-    <form [formRoot]="createSkillForm">
-      <app-create-skill-form-fields [fields]="createSkillForm"></app-create-skill-form-fields>
-      <!-- 作成ボタン -->
-      <button type="submit" [disabled]="createSkillForm().submitting()">
-        {{ createSkillForm().submitting() ? 'Creating...' : 'Create' }}
-      </button>
-    </form>
-    <app-skill-list
-      [currentDateTime]="currentDateTime()"
-      [skills]="skills()"
-      (useSkill)="useSkill($event)"
-      (addCharge)="addCharge($event)"
-      (deleteSkill)="deleteSkill($event)"
-    ></app-skill-list>
+    <div class="flex h-full place-content-between">
+      <div class="flex h-full grow flex-col gap-8 overflow-auto">
+        <form [formRoot]="createSkillForm">
+          <app-create-skill-form-fields [fields]="createSkillForm"></app-create-skill-form-fields>
+          <button type="submit" [disabled]="createSkillForm().submitting()">
+            {{ createSkillForm().submitting() ? 'Creating...' : 'Create' }}
+          </button>
+        </form>
+        <app-skill-list
+          [currentDateTime]="currentDateTime()"
+          [skills]="skills()"
+          (useSkill)="useSkill($event)"
+          (selectSkill)="toggleSelectSkill($event)"
+        ></app-skill-list>
+      </div>
+      @if (selectedSkill(); as selectedSkill) {
+        <div class="h-full overflow-auto">
+          <app-skill-detail
+            [skill]="selectedSkill"
+            [currentDateTime]="currentDateTime()"
+            (useSkill)="useSkill($event)"
+            (addCharge)="addCharge($event)"
+            (deleteSkill)="deleteSkill($event)"
+            (selectSkill)="toggleSelectSkill($event)"
+          ></app-skill-detail>
+        </div>
+      }
+    </div>
   `,
   styles: ``,
 })
@@ -61,6 +76,14 @@ export class SkillPageUi {
   });
   /** スキルのリスト */
   readonly skills = this.skillReader.skills();
+  readonly selectedSkillId = signal<SkillId | null>(null);
+  readonly selectedSkill = computed(() => {
+    const selectedSkillId = this.selectedSkillId();
+    if (selectedSkillId == null) {
+      return null;
+    }
+    return this.skills().find((skill) => skill.id === selectedSkillId) ?? null;
+  });
 
   /**
    * スキルを作成します。
@@ -94,5 +117,13 @@ export class SkillPageUi {
    */
   async deleteSkill(deleteSkillEvent: DeleteSkillEvent): Promise<void> {
     await this.skillMutator.handleDeleteSkillEvent(deleteSkillEvent);
+  }
+
+  /**
+   * スキルの選択をトグルします。
+   * @param skillId スキルID
+   */
+  async toggleSelectSkill(skillId: SkillId): Promise<void> {
+    this.selectedSkillId.update((current) => (current == skillId ? null : skillId));
   }
 }

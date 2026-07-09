@@ -1,12 +1,8 @@
 import { Component, input, output } from '@angular/core';
 import { LocalDateTime } from '@js-joda/core';
 
-import {
-  AddChargeEvent,
-  DeleteSkillEvent,
-  UseSkillEvent,
-} from '../../../feature/skill/domain/event/skill-event';
-import { Skill } from '../../../feature/skill/domain/skill';
+import { UseSkillEvent } from '../../../feature/skill/domain/event/skill-event';
+import { Skill, SkillId } from '../../../feature/skill/domain/skill';
 import { SkillListItemUi } from './skill-list-item.ui';
 
 /**
@@ -22,8 +18,7 @@ import { SkillListItemUi } from './skill-list-item.ui';
           [currentDateTime]="currentDateTime()"
           [skill]="skill"
           (useSkill)="emitUseSkill($event)"
-          (addCharge)="emitAddCharge($event)"
-          (deleteSkill)="emitDeleteSkill($event)"
+          (selectSkill)="emitSelectSkill($event)"
         ></app-skill-list-item>
       }
     </div>
@@ -37,10 +32,8 @@ export class SkillListUi {
   readonly skills = input.required<Skill[]>();
   /** スキルが使用された */
   readonly useSkill = output<UseSkillEvent>();
-  /** チャージが追加された */
-  readonly addCharge = output<AddChargeEvent>();
-  /** チャージが削除された */
-  readonly deleteSkill = output<DeleteSkillEvent>();
+  /** スキルが選択された */
+  readonly selectSkill = output<SkillId>();
 
   /**
    * スキルを使用します。
@@ -51,18 +44,10 @@ export class SkillListUi {
   }
 
   /**
-   * チャージを追加します。
-   * @param addChargeEvent チャージ追加イベント
+   * スキルを選択します。
+   * @param skillId スキルID
    */
-  emitAddCharge(addChargeEvent: AddChargeEvent): void {
-    this.addCharge.emit(addChargeEvent);
-  }
-
-  /**
-   * スキルを削除します。
-   * @param deleteSkillEvent スキル削除イベント
-   */
-  emitDeleteSkill(deleteSkillEvent: DeleteSkillEvent): void {
-    this.deleteSkill.emit(deleteSkillEvent);
+  emitSelectSkill(skillId: SkillId): void {
+    this.selectSkill.emit(skillId);
   }
 }
