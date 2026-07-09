@@ -1,59 +1,38 @@
 # Recats
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.3.
+## パッケージの設計
 
-## Development server
+| パッケージ名              | 説明                                                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| controller                | アプリを動かすトリガーになれるコードの置き場です。ここだけ見れば処理の起点がすべて把握できるように独立させています。 |
+| controller/gui            | GUIのコードの置き場です。Angularのコンポーネントです。                                                               |
+| controller/automation     | スケジュール実行といった自動で実行されるコードの置き場です。                                                         |
+| error                     | 異常系を扱うコードの置き場です。異常系はシステム横断で扱う場合が多いので独立させています。                           |
+| feature                   | 基本的なコードの置き場です。                                                                                         |
+| feature/{name}            | 機能単位で分けるための置き場です。                                                                                   |
+| feature/{name}/domain     | ドメインロジックの置き場です。                                                                                       |
+| feature/{name}/repository | ドメインロジックにあるリポジトリを実装するコードの置き場です。                                                       |
+| l10n                      | ローカライゼーションのコードの置き場です。                                                                           |
+| util                      | typescriptやライブラリを便利に使うための型や関数のコードの置き場です。                                               |
 
-To start a local development server, run:
+## コンポーネントの設計
 
-```bash
-ng serve
-```
+コンポーネントのクラス名にはサフィックスとして`Ui`を付けます。
+これはコンポーネントとドメインモデルで名前が競合するのを避けるためです。
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### コンポーネントの分類や命名ルール
 
-## Code scaffolding
+これは`controller/gui/`以下でコンポーネントやディレクティブを作る時のルールです。
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+| 分類          | 説明                                                             |
+| ------------- | ---------------------------------------------------------------- |
+| parts         | アプリ全体で共有する部品です。`controller/gui/parts`に置きます。 |
+| feature-parts | 機能固有の部品です。                                             |
 
-```bash
-ng generate component component-name
-```
+また、feature-partsは一部だけ命名/設計の規則を決めています。
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| 命名             | 説明                                                                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| {name}Page       | ページを表す部品です。                                                                                                                                        |
+| {name}FormFields | フォームのフィールド群を表す部品です。Signal Formsとの相性の良さ/submitやresetの取り扱いをカスタマイズ可能にすること/を目的として、<form>は親に用意させます。 |
+| {name}Fields     | 再利用可能なフォームのフィールド群を表す部品です。                                                                                                            |
