@@ -44,8 +44,8 @@ import { SkillListUi } from './skill-list.ui';
       @if (selectedSkill(); as selectedSkill) {
         <div class="h-full overflow-auto">
           <app-skill-detail
-            [skill]="selectedSkill"
             [currentDateTime]="currentDateTime()"
+            [skill]="selectedSkill"
             (useSkill)="useSkill($event)"
             (addCharge)="addCharge($event)"
             (deleteSkill)="deleteSkill($event)"
