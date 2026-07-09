@@ -113,7 +113,6 @@ export class CreateSkillFormUi {
   async createSkill(createSkillForm: CreateSkillForm): Promise<TreeValidationResult> {
     const createSkillEvent = toCreateSkillEvent(createSkillForm, this.currentDateTime());
     const skillId = await this.skillMutator.handleCreateSkillEvent(createSkillEvent); // NOTE エラーをバリデーションエラーとしたい場合はcatchしてValidationErrorを返してください。
-    this.reset();
     this.skillCreated.emit(skillId);
   }
 }
