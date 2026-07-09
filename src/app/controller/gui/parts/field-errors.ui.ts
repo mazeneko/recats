@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FieldState } from '@angular/forms/signals';
 
 /**
@@ -17,7 +17,6 @@ import { FieldState } from '@angular/forms/signals';
     }
   `,
   styles: ``,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FieldErrorsUi<T> {
   /** フィールドのステータス */
