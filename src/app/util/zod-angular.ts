@@ -32,7 +32,7 @@ export const zodFormField = {
  */
 export function zodValidate<T extends z.ZodType>(
   zodType: T,
-  field: SchemaPath<z.input<T>>,
+  field: SchemaPath<unknown>, // SchemaPath<z.input<T>>とすれば型を付けられますが、enum等の場合にフィールドの型(string)とz.input('a'|'b')が一致しないので一律でunknownにしています。
   options?: {
     /** 必須。デフォルトは`true` */
     required?: boolean;
@@ -54,7 +54,7 @@ export function zodValidate<T extends z.ZodType>(
       return null;
     }
     // パースをしてみて成功すればOKです。
-    const parsed = zodSafeParse(zodType, value);
+    const parsed = zodUnknownSafeParse(zodType, value);
     if (parsed.success) {
       return null;
     }
