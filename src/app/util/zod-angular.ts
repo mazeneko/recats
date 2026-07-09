@@ -11,9 +11,13 @@ const NumberField = z.union([z.number(), z.nan()]);
 const BooleanField = z.boolean();
 
 /** 文字列フィールド(未入力はnullへ変換) */
-const StringFieldWithNull = StringField.transform((value) => (value === '' ? null : value));
+const StringFieldWithNull = StringField.nullable().transform((value) =>
+  value === '' ? null : value,
+);
 /** 数値フィールド(未入力はnullへ変換) */
-const NumberFieldWithNull = NumberField.transform((value) => (Number.isNaN(value) ? null : value));
+const NumberFieldWithNull = NumberField.nullable().transform((value) =>
+  Number.isNaN(value) ? null : value,
+);
 
 /**
  * 文字列フィールドのスキーマを作ります。
@@ -79,12 +83,12 @@ export function zodValidate<T extends z.ZodType>(
   validate(field, (context) => {
     const value = context.value();
     // 空の場合はOKとします。空からどうかはzodFormFieldの判定と合わせています。
-    const empty = value === '' || Number.isNaN(value);
+    const empty = value == null || value === '' || Number.isNaN(value);
     if (empty) {
       return null;
     }
     // パースをしてみて成功すればOKです。
-    const parsed = zodUnknownSafeParse(zodType, value);
+    const parsed = zodUnknownSafeParse(zodType, value as unknown);
     if (parsed.success) {
       return null;
     }
