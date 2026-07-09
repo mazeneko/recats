@@ -12,6 +12,8 @@ import {
   AddChargeEvent,
   CreateSkillEvent,
   DeleteSkillEvent,
+  EditRecastEvent,
+  EditSkillNameEvent,
   UseSkillEvent,
 } from '../domain/event/skill-event';
 import { Skill, SkillId } from '../domain/skill';
@@ -46,6 +48,30 @@ export class InMemorySkillStore implements SkillReader, SkillMutator {
     const skill = skillLogic.createSkill(event);
     this.#saveOrUpdate(skill);
     return skill.id;
+  }
+
+  async handleEditSkillNameEvent(event: EditSkillNameEvent): Promise<void> {
+    const skill = await this.getById(event.skillId);
+    if (skill == null) {
+      throw new CustomError(`ID[${event.skillId}]のスキルが見つかりません。`, {
+        errorCode: 'SkillNotFoundError',
+        skillId: event.skillId,
+      });
+    }
+    const updatedSkill = skillLogic.editSkillName(skill, event);
+    this.#saveOrUpdate(updatedSkill);
+  }
+
+  async handleEditRecastEvent(event: EditRecastEvent): Promise<void> {
+    const skill = await this.getById(event.skillId);
+    if (skill == null) {
+      throw new CustomError(`ID[${event.skillId}]のスキルが見つかりません。`, {
+        errorCode: 'SkillNotFoundError',
+        skillId: event.skillId,
+      });
+    }
+    const updatedSkill = skillLogic.editRecast(skill, event);
+    this.#saveOrUpdate(updatedSkill);
   }
 
   async handleUseSkillEvent(event: UseSkillEvent): Promise<void> {

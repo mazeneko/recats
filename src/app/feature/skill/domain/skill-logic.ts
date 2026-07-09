@@ -1,7 +1,7 @@
 import { Duration, LocalDateTime } from '@js-joda/core';
 
 import { zodParse } from '../../../util/zod';
-import { CreateSkillEvent } from './event/skill-event';
+import { CreateSkillEvent, EditRecastEvent, EditSkillNameEvent } from './event/skill-event';
 import { Recast, RecastFrom } from './recast';
 import { completedAt, isTimeBased } from './recast-logic';
 import { ChargeCount, ChargeSchedule, Skill, UsedAt } from './skill';
@@ -28,6 +28,51 @@ export function createSkill(event: CreateSkillEvent): Skill {
     chargeLimit: event.chargeLimit,
     chargeSchedules,
     otherCharges,
+  });
+}
+
+/**
+ * スキル名を編集します。
+ * @param skill 編集するスキル
+ * @param event スキル名を編集するイベント
+ * @returns 編集したスキル
+ */
+export function editSkillName(skill: Skill, event: EditSkillNameEvent): Skill {
+  return zodParse(Skill, {
+    id: skill.id,
+    name: event.name,
+    createdAt: skill.createdAt,
+    lastUsedAt: skill.lastUsedAt,
+    recast: skill.recast,
+    chargeLimit: skill.chargeLimit,
+    chargeSchedules: skill.chargeSchedules,
+    otherCharges: skill.otherCharges,
+  });
+}
+
+/**
+ * リキャストを編集します。
+ * @param skill 編集するスキル
+ * @param event リキャストを編集するイベント
+ * @returns 編集したスキル
+ */
+export function editRecast(skill: Skill, event: EditRecastEvent): Skill {
+  const recastFrom = zodParse(RecastFrom, event.editedAt);
+  const otherCharges = zodParse(ChargeCount, 0);
+  const chargeSchedules = scheduleCharges(
+    event.recast,
+    recastFrom,
+    event.chargeLimit - otherCharges,
+  );
+  return zodParse(Skill, {
+    id: skill.id,
+    name: skill.name,
+    createdAt: skill.createdAt,
+    lastUsedAt: skill.lastUsedAt,
+    recast: event.recast,
+    chargeLimit: event.chargeLimit,
+    chargeSchedules,
+    otherCharges: skill.otherCharges,
   });
 }
 

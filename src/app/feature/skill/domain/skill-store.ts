@@ -4,6 +4,8 @@ import {
   AddChargeEvent,
   CreateSkillEvent,
   DeleteSkillEvent,
+  EditRecastEvent,
+  EditSkillNameEvent,
   UseSkillEvent,
 } from './event/skill-event';
 import { Skill, SkillId } from './skill';
@@ -50,6 +52,18 @@ export interface SkillMutator {
    * @returns 作成したスキルのID
    */
   readonly handleCreateSkillEvent: (event: CreateSkillEvent) => Promise<SkillId>;
+
+  /**
+   * スキル名編集イベントをハンドルします。
+   * @param event スキル名編集イベント
+   */
+  readonly handleEditSkillNameEvent: (event: EditSkillNameEvent) => Promise<void>;
+
+  /**
+   * リキャスト編集イベントをハンドルします。
+   * @param event リキャスト編集イベント
+   */
+  readonly handleEditRecastEvent: (event: EditRecastEvent) => Promise<void>;
   /**
    * スキル使用イベントをハンドルします。
    * @param event スキル使用イベント

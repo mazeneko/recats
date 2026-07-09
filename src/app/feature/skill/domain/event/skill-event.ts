@@ -6,6 +6,7 @@ import {
   ChargeLimit,
   CreatedAt,
   DeletedAt,
+  EditedAt,
   HasInitiallyCharge,
   SkillId,
   SkillName,
@@ -30,6 +31,38 @@ export const CreateSkillEvent = z
   .brand<typeof CreateSkillEventBrand>()
   .readonly();
 export type CreateSkillEvent = z.output<typeof CreateSkillEvent>;
+
+/** スキル名を編集するイベント */
+export const EditSkillNameEventBrand = Symbol();
+export const EditSkillNameEvent = z
+  .strictObject({
+    /** スキルID */
+    skillId: SkillId,
+    /** スキル名 */
+    name: SkillName,
+    /** 編集日時 */
+    editedAt: EditedAt,
+  })
+  .brand<typeof EditSkillNameEventBrand>()
+  .readonly();
+export type EditSkillNameEvent = z.output<typeof EditSkillNameEvent>;
+
+/** リキャストを編集するイベント */
+export const EditRecastEventBrand = Symbol();
+export const EditRecastEvent = z
+  .strictObject({
+    /** スキルID */
+    skillId: SkillId,
+    /** リキャスト */
+    recast: Recast,
+    /** 最大チャージ数 */
+    chargeLimit: ChargeLimit,
+    /** 編集日時 */
+    editedAt: EditedAt,
+  })
+  .brand<typeof EditRecastEventBrand>()
+  .readonly();
+export type EditRecastEvent = z.output<typeof EditRecastEvent>;
 
 /** スキルを使用するイベント */
 export const UseSkillEventBrand = Symbol();

@@ -12,6 +12,8 @@ import {
   AddChargeEvent,
   CreateSkillEvent,
   DeleteSkillEvent,
+  EditRecastEvent,
+  EditSkillNameEvent,
   UseSkillEvent,
 } from '../domain/event/skill-event';
 import { Skill, SkillId } from '../domain/skill';
@@ -57,6 +59,14 @@ export class LocalStorageSkillStore implements SkillReader, SkillMutator {
 
   async handleCreateSkillEvent(event: CreateSkillEvent): Promise<SkillId> {
     return this.#inMemorySkillStore.handleCreateSkillEvent(event);
+  }
+
+  async handleEditSkillNameEvent(event: EditSkillNameEvent): Promise<void> {
+    return this.#inMemorySkillStore.handleEditSkillNameEvent(event);
+  }
+
+  async handleEditRecastEvent(event: EditRecastEvent): Promise<void> {
+    return this.#inMemorySkillStore.handleEditRecastEvent(event);
   }
 
   async handleUseSkillEvent(event: UseSkillEvent): Promise<void> {

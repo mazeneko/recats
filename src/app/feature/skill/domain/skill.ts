@@ -18,6 +18,11 @@ export const CreatedAtBrand = Symbol();
 export const CreatedAt = LocalDateTimeCoerce.brand<typeof CreatedAtBrand>();
 export type CreatedAt = z.output<typeof CreatedAt>;
 
+/** スキル編集日時 */
+export const EditedAtBrand = Symbol();
+export const EditedAt = LocalDateTimeCoerce.brand<typeof EditedAtBrand>();
+export type EditedAt = z.output<typeof EditedAt>;
+
 /** スキル使用日時 */
 export const UsedAtBrand = Symbol();
 export const UsedAt = LocalDateTimeCoerce.brand<typeof UsedAtBrand>();
