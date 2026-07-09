@@ -73,7 +73,7 @@ export const LocalTimeCoerce = z
  * - ISO形式の日時文字列
  */
 export const LocalDateTimeCoerce = z
-  .union([ZodLocalDateTime, z.date(), z.iso.datetime()])
+  .union([ZodLocalDateTime, z.date(), z.iso.datetime({ local: true })])
   .transform<LocalDateTime>((value) => {
     if (value instanceof LocalDateTime) {
       return value;
