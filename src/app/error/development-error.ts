@@ -27,9 +27,9 @@ export type DevelopmentErrorDetail = FocusAfterNavigationTargetMistake | FormDef
  * {@link FocusAfterNavigation}の対象がHTMLElementになっていないミス
  *
  */
-export type FocusAfterNavigationTargetMistake = {
+export interface FocusAfterNavigationTargetMistake {
   readonly errorCode: 'FocusAfterNavigationTargetMistake';
-};
+}
 
 /**
  * フォームの定義ミス
@@ -37,7 +37,7 @@ export type FocusAfterNavigationTargetMistake = {
  * なんらかの値を作るためにフォームを定義しているとき、
  * フォームがvalidになっているのに目的の値が作成できなかった場合に使用します。
  */
-export type FormDefinitionMistake = {
+export interface FormDefinitionMistake {
   readonly errorCode: 'FormDefinitionMistake';
   readonly formValue: unknown;
-};
+}
