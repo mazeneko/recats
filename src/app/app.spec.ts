@@ -1,12 +1,19 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+
 import { App } from './app';
+import { provideInMemorySkillStore } from './feature/skill/repository/in-memory-skill-store';
+import { provideCurrentDateTime } from './util/current-date-time-provider';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideZonelessChangeDetection()],
+      providers: [
+        provideZonelessChangeDetection(),
+        provideCurrentDateTime(),
+        provideInMemorySkillStore(),
+      ],
     }).compileComponents();
   });
 
@@ -16,10 +23,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', () => {
+  it('should have app-skill-page', async () => {
     const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
+    await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Welcome to recats');
+    expect(compiled.querySelector('app-skill-page')).not.toBeNull();
   });
 });
