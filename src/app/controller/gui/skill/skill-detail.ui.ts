@@ -59,6 +59,7 @@ import { zodParse } from '../../../util/zod';
   styles: ``,
 })
 export class SkillDetailUi {
+  // TODO ここでスキルを編集できるようにする
   /** 現在日時 */
   readonly currentDateTime = input.required<LocalDateTime>();
   /** スキル */

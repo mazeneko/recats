@@ -49,6 +49,7 @@ import { SkillListUi } from './skill-list.ui';
   styles: ``,
 })
 export class SkillPageUi {
+  // TODO ページですべてのサービス扱うのやめる　スキルリストとかスキル詳細でサービス使うようにした独立したコンポーネント扱いする
   /** 現在日時 */
   readonly currentDateTime = inject(CURRENT_DATE_TIME);
   /** SkillReader */

@@ -53,6 +53,7 @@ export class CreateSkillFormFieldsUi {
   readonly fields = input.required<FieldTree<CreateSkillForm>>();
 }
 
+// TODO 作成フォームは名前だけの入力にする(作成イベントはそのままリキャストとかも設定できるように残しておく)
 /** スキル作成フォーム */
 export const CreateSkillForm = z
   .strictObject({
