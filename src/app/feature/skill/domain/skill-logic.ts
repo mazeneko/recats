@@ -13,12 +13,7 @@ import { ChargeCount, ChargeSchedule, Skill, UsedAt } from './skill';
  */
 export function createSkill(event: CreateSkillEvent): Skill {
   const recastFrom = zodParse(RecastFrom, event.createdAt);
-  const otherCharges = zodParse(ChargeCount, event.hasInitiallyCharge ? 1 : 0);
-  const chargeSchedules = scheduleCharges(
-    event.recast,
-    recastFrom,
-    event.chargeLimit - otherCharges,
-  );
+  const chargeSchedules = scheduleCharges(event.recast, recastFrom, event.chargeLimit);
   return zodParse(Skill, {
     id: crypto.randomUUID(),
     name: event.name,
@@ -27,7 +22,7 @@ export function createSkill(event: CreateSkillEvent): Skill {
     recast: event.recast,
     chargeLimit: event.chargeLimit,
     chargeSchedules,
-    otherCharges,
+    otherCharges: 0,
   });
 }
 

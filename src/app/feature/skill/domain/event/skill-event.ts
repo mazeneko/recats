@@ -6,7 +6,6 @@ import {
   ChargeLimit,
   CreatedAt,
   DeletedAt,
-  HasInitiallyCharge,
   SkillId,
   SkillName,
   UsedAt,
@@ -18,14 +17,12 @@ export const CreateSkillEvent = z
   .strictObject({
     /** スキル名 */
     name: SkillName,
-    /** 最大チャージ数 */
-    chargeLimit: ChargeLimit,
-    /** リキャスト */
-    recast: Recast,
-    /** 初期チャージを持っている */
-    hasInitiallyCharge: HasInitiallyCharge,
     /** 作成日時 */
     createdAt: CreatedAt,
+    /** リキャスト */
+    recast: Recast,
+    /** 最大チャージ数 */
+    chargeLimit: ChargeLimit,
   })
   .brand<typeof CreateSkillEventBrand>()
   .readonly();

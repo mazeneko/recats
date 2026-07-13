@@ -5,7 +5,7 @@ import z from 'zod';
 
 import { DevelopmentError } from '../../../error/development-error';
 import { CreateSkillEvent } from '../../../feature/skill/domain/event/skill-event';
-import { ChargeLimit, HasInitiallyCharge, SkillName } from '../../../feature/skill/domain/skill';
+import { ChargeLimit, SkillName } from '../../../feature/skill/domain/skill';
 import { zodParse, zodSafeParse } from '../../../util/zod';
 import { zodFormField, zodValidate } from '../../../util/zod-angular';
 import { FieldErrorsUi } from '../parts/field-errors.ui';
@@ -34,13 +34,6 @@ import {
       <app-delegating-recast-fields
         [fields]="fields().delegatingRecastFields"
       ></app-delegating-recast-fields>
-      <!-- 初期チャージを持っている -->
-      <div>
-        <label
-          >Has Initially Charge:<input type="checkbox" [formField]="fields().hasInitiallyCharge"
-        /></label>
-        <app-field-errors [fieldState]="fields().hasInitiallyCharge()"></app-field-errors>
-      </div>
       <!-- 最大チャージ数 -->
       <div>
         <label
@@ -67,8 +60,6 @@ export const CreateSkillForm = z
     name: zodFormField.string(),
     /** リキャストのフィールド */
     delegatingRecastFields: DelegatingRecastFields,
-    /** 初期チャージを持っている */
-    hasInitiallyCharge: zodFormField.boolean(),
     /** 最大チャージ数 */
     chargeLimit: zodFormField.number(),
   })
@@ -79,7 +70,6 @@ export type CreateSkillForm = z.input<typeof CreateSkillForm>;
 export const CREATE_SKILL_FORM_SCHEMA = schema<CreateSkillForm>((schemaPath) => {
   zodValidate(SkillName, schemaPath.name);
   apply(schemaPath.delegatingRecastFields, DELEGATING_RECAST_FIELDS_SCHEMA);
-  zodValidate(HasInitiallyCharge, schemaPath.hasInitiallyCharge, { required: false });
   zodValidate(ChargeLimit, schemaPath.chargeLimit);
 });
 
@@ -98,10 +88,9 @@ export function toCreateSkillEvent(
   // スキル作成イベントを作成します。
   const createSkillEvent = zodSafeParse(CreateSkillEvent, {
     name: form.name,
-    recast,
-    hasInitiallyCharge: form.hasInitiallyCharge,
-    chargeLimit: form.chargeLimit,
     createdAt: now,
+    recast,
+    chargeLimit: form.chargeLimit,
   });
   if (!createSkillEvent.success) {
     throw new DevelopmentError('スキル作成イベントに変換できませんでした。', {
@@ -120,7 +109,6 @@ export function defaultCreateSkillForm(): CreateSkillForm {
   return {
     name: '',
     delegatingRecastFields: defaultDelegatingRecastFields(),
-    hasInitiallyCharge: false,
     chargeLimit: 1,
   };
 }
