@@ -43,11 +43,6 @@ export const ChargeAddedAtBrand = Symbol();
 export const ChargeAddedAt = LocalDateTimeCoerce.brand<typeof ChargeAddedAtBrand>();
 export type ChargeAddedAt = z.output<typeof ChargeAddedAt>;
 
-/** 初期チャージを持っている */
-export const HasInitiallyChargeBrand = Symbol();
-export const HasInitiallyCharge = z.boolean().brand<typeof HasInitiallyChargeBrand>();
-export type HasInitiallyCharge = z.output<typeof HasInitiallyCharge>;
-
 /**
  * チャージのスケジュール
  */
